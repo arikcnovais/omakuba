@@ -1,0 +1,38 @@
+{
+  "editor.fontFamily": "'JetBrainsMono Nerd Font', 'Ubuntu Sans Mono', monospace",
+  "editor.fontSize": 13,
+  "editor.lineHeight": 1.6,
+  "editor.fontLigatures": true,
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "editor.cursorBlinking": "smooth",
+  "editor.cursorSmoothCaretAnimation": "on",
+  "editor.smoothScrolling": true,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.minimap.enabled": false,
+  "editor.rulers": [80, 120],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.autoSave": "afterDelay",
+  "workbench.startupEditor": "none",
+  "workbench.sideBar.location": "left",
+  "workbench.editor.enablePreview": true,
+  "explorer.compactFolders": true,
+  "search.smartCase": true,
+  "git.autofetch": true,
+  "git.confirmEmptyCommits": false,
+  "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font', monospace",
+  "terminal.integrated.fontSize": 12,
+  "terminal.integrated.defaultProfile.linux": "zsh",
+  "problems.autoReveal": false,
+  "telemetry.telemetryLevel": "off",
+  "[javascript][typescript][javascriptreact][typescriptreact][json][jsonc][html][css][scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[csharp]": {
+    "editor.defaultFormatter": "ms-dotnettools.csharp"
+  }
+}

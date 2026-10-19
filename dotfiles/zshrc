@@ -1,0 +1,126 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  ~/.zshrc — omakuba
+#  Terminal focado em desenvolvimento: histórico persistente, plugins leves,
+#  aliases de dev e prompt (starship) com linguagens (Node/.NET).
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Histórico ────────────────────────────────────────────────────────────────
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=50000
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_ALL_DUPS   # não repete comandos iguais
+setopt HIST_IGNORE_SPACE      # comando começando com espaço não entra
+setopt HIST_REDUCE_BLANKS
+setopt INC_APPEND_HISTORY     # histórico compartilhado entre shells
+
+# ── Comportamento ────────────────────────────────────────────────────────────
+setopt AUTO_CD                 # cd pasta/ sem digitar "cd"
+setopt AUTO_PUSHD              # diretórios visitados viram pilha
+setopt PUSHD_IGNORE_DUPS
+setopt INTERACTIVE_COMMENTS
+setopt NO_BEEP
+setopt NO_FLOW_CONTROL         # Ctrl+S livre no terminal
+setopt COMPLETE_IN_WORD
+
+# ── Completion ───────────────────────────────────────────────────────────────
+autoload -Uz compinit
+compinit
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+
+# ── Cores do ls ──────────────────────────────────────────────────────────────
+if command -v dircolors >/dev/null; then
+  eval "$(dircolors -b)"
+fi
+
+# ── Teclas ───────────────────────────────────────────────────────────────────
+setopt HIST_FIND_NO_DUPS
+
+# ── Caminhos ─────────────────────────────────────────────────────────────────
+typeset -U path PATH
+path=(
+  "$HOME/.local/bin"
+  "$HOME/bin"
+  "$HOME/.dotnet/tools"        # dotnet-ef, csharpier
+  $path
+)
+export PATH
+
+# nvm (Node)
+export NVM_DIR="$HOME/.nvm"
+[[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+
+# ── Editor ───────────────────────────────────────────────────────────────────
+export EDITOR="vim"
+export VISUAL="$EDITOR"
+export PAGER="less -R"
+export LESSHISTFILE=-
+export LESS="-X -F"
+
+# ── Aliases ──────────────────────────────────────────────────────────────────
+alias ls="ls --color=auto --group-directories-first"
+alias ll="ls -alh --color=auto"
+alias la="ls -A --color=auto"
+alias ..="cd .."
+alias ...="cd ../.."
+
+# Ubuntu suffixa alguns binários (bat, fd)
+alias bat="batcat"
+alias fd="fdfind"
+
+# git curto
+alias g="git"
+alias gs="git status -sb"
+alias ga="git add"
+alias gc="git commit -m"
+alias gp="git push"
+alias gd="git diff"
+alias gl="git log --oneline --graph --decorate -20"
+
+# dev
+alias ports="ss -tulanp"
+alias top="htop"
+alias tree="tree -C"
+alias serve="python3 -m http.server 8000"
+alias dps="docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'"
+alias dpa="docker ps -a"
+alias k9s="kubectl get pods -A"  # só faz sentido se tiver k8s
+
+# ── Plugins ──────────────────────────────────────────────────────────────────
+ZSH_PLUGIN_DIR="$HOME/.local/share/zsh/plugins"
+if [[ -f "$ZSH_PLUGIN_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+  ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+  ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=40
+  source "$ZSH_PLUGIN_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh"
+fi
+
+# Busca no histórico pelas setas ↑/↓ (histórico "vivo").
+if [[ -o interactive && -t 0 ]] && [[ -f "$ZSH_PLUGIN_DIR/zsh-history-substring-search/zsh-history-substring-search.zsh" ]]; then
+  zmodload zsh/zle
+  source "$ZSH_PLUGIN_DIR/zsh-history-substring-search/zsh-history-substring-search.zsh"
+  bindkey '^[[A' history-substring-search-up
+  bindkey '^[[B' history-substring-search-down
+fi
+
+# ── Prompt (starship) ────────────────────────────────────────────────────────
+if command -v starship >/dev/null; then
+  eval "$(starship init zsh)"
+fi
+
+# fzf
+[[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]] \
+  && source /usr/share/doc/fzf/examples/key-bindings.zsh
+[[ -f /usr/share/doc/fzf/examples/completion.zsh ]] \
+  && source /usr/share/doc/fzf/examples/completion.zsh
+
+# syntax highlighting por último
+if [[ -f "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+  source "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+fi
+
+# ── Sobrescritas locais (opcional) ───────────────────────────────────────────
+[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

@@ -1,0 +1,10 @@
+# artefatos comuns
+*.log
+*.tmp
+*.swp
+*~
+
+# sistema
+.DS_Store
+Thumbs.db
+.directory

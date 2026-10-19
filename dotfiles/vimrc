@@ -1,0 +1,60 @@
+# ~/.vimrc — omakuba
+# Vim para edits rápidos no terminal: enxuto, bonito e sem surpresas.
+
+set nocompatible
+filetype plugin indent on
+syntax enable
+
+set encoding=utf-8
+
+" ── Appearance ───────────────────────────────────────────────────────────────
+set number
+set ruler
+set showcmd
+set laststatus=2
+set cursorline
+set signcolumn=no
+set background=dark
+if has('termguicolors')
+  set termguicolors
+  silent! colorscheme habamax        " paleta sóbria, casa com o terminal
+endif
+set visualbell t_vb=                 " sem bipe piscando
+
+" ── Movement / search ───────────────────────────────────────────────────────
+set ignorecase
+set smartcase
+set incsearch
+set hlsearch
+set scrolloff=5
+set sidescrolloff=8
+set wrap
+set linebreak
+set display+=lastline
+
+" ── Editing ─────────────────────────────────────────────────────────────────
+set expandtab
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+set smartindent
+set autoindent
+set backspace=indent,eol,start
+set updatetime=300
+set history=1000
+
+" ── Clipboard ────────────────────────────────────────────────────────────────
+if has('clipboard')
+  set clipboard=unnamedplus
+endif
+
+" ── Undo persistente ────────────────────────────────────────────────────────
+set undofile
+if !isdirectory(expand('~/.vim/undo'))
+  call mkdir(expand('~/.vim/undo'), 'p')
+endif
+
+" ── Janela ──────────────────────────────────────────────────────────────────
+set splitbelow
+set splitright
+set equalalways

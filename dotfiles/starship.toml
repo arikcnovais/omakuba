@@ -1,0 +1,55 @@
+# ~/.config/starship.toml — omakuba
+# Prompt minimalista: pasta → branch → status → linguagem (Node/.NET).
+
+format = """
+$directory\
+$git_branch\
+$git_status\
+$nodejs\
+$dotnet\
+$line_break\
+$character"""
+
+add_newline = false
+command_timeout = 1000
+
+# ── Git ──────────────────────────────────────────────────────────────────────
+[git_branch]
+format = " on [$symbol$branch]($style) "
+symbol = " "
+style = "bold orange"
+
+[git_status]
+format = "$conflicts$untracked$modified$staged"
+style = "bold"
+conflicted = "✖"
+untracked = "? "
+modified = "!"
+staged = "+"
+
+# ── Linguagens ───────────────────────────────────────────────────────────────
+[nodejs]
+symbol = " node "
+style = "bold green"
+format = "[$symbol($version )]($style)"
+
+[dotnet]
+symbol = " dotnet "
+style = "bold purple"
+format = "[$symbol($version )]($style)"
+
+[docker_context]
+symbol = "  docker "
+style = "bold blue"
+format = "[$symbol]($style)"
+
+# ── Partes ───────────────────────────────────────────────────────────────────
+[directory]
+style = "bold cyan"
+format = "[$path]($style) "
+truncate_to_repo = true
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol   = "[❯](bold red)"
+vicmd_symbol   = "[❮](bold yellow)"
