@@ -13,7 +13,7 @@ Se já existir algo no destino, o original é guardado antes em
 | `vimrc` | `~/.vimrc` | Vim de emergência: numeração, cursorline, busca inteligente, undo persistente e clipboard do sistema. |
 | `tmux.conf` | `~/.tmux.conf` | sessões que sobrevivem à queda de conexão, mouse, histórico de 50 mil linhas, índices a partir de 1 e barra discreta. |
 | `vscode-settings.json` | `~/.config/Code/User/settings.json` | settings de web e C#, com format on save, minimap desligado e telemetria off. O passo `40-vscode` faz merge e nunca sobrescreve o que você já escolheu. |
-| `backgrounds/Bamboo_wallpaper.png` | `/usr/share/backgrounds/omakuba/Bamboo_wallpaper.png` | papel de parede padrão do projeto. O XML que o passo `60-wallpapers` cria faz ele aparecer em Configurações, Aparência, Papel de parede. |
+| `backgrounds/` | `/usr/share/backgrounds/omakuba/` | seus wallpapers. O passo `60-wallpapers` instala todas as imagens da pasta e cria o XML que faz cada uma aparecer em Configurações, Aparência, Papel de parede. O Bamboo, se estiver na pasta, vira o padrão. |
 
 ## O que o script configura fora dos dotfiles
 
@@ -22,7 +22,7 @@ Se já existir algo no destino, o original é guardado antes em
 | `~/.config/xdg-terminals.list` | deixa o Kitty como terminal preferido do sistema, com a entrada `kitty.desktop` | `90-dotfiles` |
 | GNOME Terminal | perfil omakuba, com a paleta Breath, a Nerd Font e 8% de transparência. No 26.04 isso só acontece se você tiver instalado o GNOME Terminal por conta própria | `20-terminal` |
 | Ptyxis | fonte, cursor, opacidade e scrollback. Só no 26.04, que é onde ele é o terminal padrão | `20-terminal` |
-| gsettings e dconf | Yaru dark, dock enxuto, 5 workspaces fixos, `Super+Return`, favoritos do dock, relógio curto, desktop sem ícones e o wallpaper Bamboo | `50-gnome` e `60-wallpapers` |
+| gsettings e dconf | Yaru dark, dock enxuto, 5 workspaces fixos, `Super+Return`, favoritos do dock, relógio curto, desktop sem ícones e o wallpaper padrão | `50-gnome` e `60-wallpapers` |
 | Extensões do GNOME | no 24.04: Forge, Blur my Shell, Vitals e Caffeine. No 26.04: Blur my Shell, Vitals e Caffeine | `50-gnome` |
 | Extensões do VS Code | C#, C# Dev Kit, ESLint, Prettier, EditorConfig, Docker, YAML e mais algumas | `40-vscode` |
 

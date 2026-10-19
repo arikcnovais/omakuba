@@ -77,7 +77,7 @@ explicado na página de instalação do .NET no Ubuntu.
 | `30-dev` | nvm, Node LTS, pnpm, yarn, .NET e ferramentas do dotnet |
 | `40-vscode` | extensões do VS Code e merge das settings |
 | `50-gnome` | extensões do GNOME, dock, workspaces e o atalho do Kitty |
-| `60-wallpapers` | Bamboo como padrão e o pack de wallpapers dinâmicos |
+| `60-wallpapers` | instala os wallpapers que você deixar em `dotfiles/backgrounds/` e aplica o Bamboo como padrão |
 | `90-dotfiles` | copia os dotfiles, com backup do que já existia |
 
 ## O que você recebe
@@ -95,7 +95,7 @@ explicado na página de instalação do .NET no Ubuntu.
 | Docker | seu usuário no grupo docker, sem precisar de sudo no dia a dia |
 | Git | lazygit e tmux, mas o Git em si fica por sua conta |
 | VS Code | extensões de web e C#, com settings que se misturam às suas |
-| Papel de parede | Bamboo em 5K, mais o pack de wallpapers dinâmicos |
+| Papel de parede | os wallpapers que você colocar em `dotfiles/backgrounds/`, com o Bamboo como padrão |
 
 ## Atalhos
 
@@ -167,8 +167,9 @@ Se quiser trocar de paleta, os hexadecimais ficam em `dotfiles/kitty.conf`,
    git config --global user.name "Seu Nome"
    git config --global user.email "voce@exemplo.com"
    ```
-4. Olhe os outros papéis de parede em Configurações, Aparência, Papel de parede.
-   O Bamboo vem como padrão.
+4. Seus wallpapers ficam em Configurações, Aparência, Papel de parede. Basta
+   jogar as imagens em `dotfiles/backgrounds/` e rodar `./install.sh 60-wallpapers`.
+   O Bamboo, se estiver na pasta, vira o padrão.
 
 ## Dotfiles
 
@@ -180,8 +181,7 @@ guardado antes em `~/.omakuba-backup-<data>/`.
 
 - A filosofia de "um comando e o ambiente está pronto" veio do Omakub, mas o
   código aqui é próprio.
-- Os wallpapers dinâmicos vêm de
-  [Chillsmeit/linux-dynamic-wallpapers](https://github.com/Chillsmeit/linux-dynamic-wallpapers).
+- Os wallpapers são seus, colocados em `dotfiles/backgrounds/`.
 - A paleta Breath vem do Manjaro
   ([Manjaro Artwork, Breath](https://gitlab.manjaro.org/artwork/themes/breath)).
 - O Yaru é o tema do Ubuntu e continua intacto.

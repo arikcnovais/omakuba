@@ -47,7 +47,7 @@ usage() {
     30-dev         Node LTS, pnpm, yarn, .NET 10 e ferramentas do dotnet
     40-vscode      extensões e settings do VS Code
     50-gnome       Blur my Shell, Vitals, Caffeine e ajustes do Yaru
-    60-wallpapers  Bamboo e os wallpapers dinâmicos
+    60-wallpapers  instala os wallpapers que estão em dotfiles/backgrounds
     90-dotfiles    copia os dotfiles, com backup do que já existe
 
   Uso:
