@@ -29,7 +29,7 @@ tema e deixando tudo minimalista.
 | **Docker** | usuário no grupo `docker` (builds com `docker compose` sem `sudo`) |
 | **Git/fluxo** | **lazygit** (TUI), **tmux** para sessões longas |
 | **VS Code** | conjunto enxuto de extensões (C#, ESLint, Prettier, Docker…) + settings minimalistas |
-| **Fundo de tela** | pack de wallpapers **dinâmicos** (mudam com o horário), com um dark minimal aplicado por padrão |
+| **Fundo de tela** | **Bamboo** (5K) como padrão — versionado em `dotfiles/backgrounds/` e disponível em Configurações › Aparência › Fundo de tela — mais o pack de wallpapers **dinâmicos** (mudam com o horário) |
 
 ---
 
@@ -43,7 +43,7 @@ tema e deixando tudo minimalista.
 | `30-dev` | **nvm** + Node LTS + `pnpm`/`yarn`/`tsc`/`prettier`; **.NET SDK 10 + 8**; `dotnet-ef`; `csharpier` |
 | `40-vscode` | extensões do VS Code + **merge** das settings (suas escolhas nunca são sobrescritas) |
 | `50-gnome` | extensões (Forge, Blur my Shell, Vitals, Caffeine), dock/superfícies polidos, teclas estilo i3, `Super+Return` → kitty |
-| `60-wallpapers` | instalador oficial dos wallpapers dinâmicos + aplica um dark minimal |
+| `60-wallpapers` | instala o **Bamboo** (wallpaper do omakuba, de `dotfiles/backgrounds/`), registra nas Configurações, aplica como padrão + instalador oficial dos wallpapers dinâmicos |
 | `90-dotfiles` | deploy dos dotfiles versionados (com backup do que já existir) |
 
 O instalador pode ser rodado **quantas vezes quiser**: tudo é idempotente.
@@ -95,8 +95,8 @@ apenas o Kitty).
    git config --global user.name "Seu Nome"
    git config --global user.email "voce@exemplo.com"
    ```
-4. Mais wallpapers: **Configurações › Fundo de tela** (o pack é grande e
-   vários são dinâmicos — mudam ao longo do dia).
+4. Mais wallpapers: **Configurações › Aparência › Fundo de tela** — o
+   **Bamboo (omakuba)** é o padrão, e o pack dinâmico traz vários outros.
 
 ---
 

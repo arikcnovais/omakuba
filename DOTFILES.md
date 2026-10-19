@@ -12,6 +12,7 @@ instalados pelo passo `90-dotfiles` do `./install.sh` (com backup automático em
 | 4 | `dotfiles/vimrc` | `~/.vimrc` | Vim de emergência/terminal: numeração, cursorline, busca inteligente, undo persistente, clipboard do sistema, paleta sóbria (habamax). |
 | 5 | `dotfiles/tmux.conf` | `~/.tmux.conf` | Sessões que sobrevivem a queda de conexão: mouse, histórico 50k, índices a partir de 1, divisões com `|` e `-`, barra discreta. |
 | 6 | `dotfiles/vscode-settings.json` | `~/.config/Code/User/settings.json` | Settings minimalistas de dev (web + C#): fonte Nerd com ligatures, format on save, minimap off, rulers 80/120, terminal integrado em zsh, telemetry off. **Merge preservando suas escolhas** (tema/ícones nunca são sobrescritos). |
+| 7 | `dotfiles/backgrounds/Bamboo_wallpaper.png` | `/usr/share/backgrounds/omakuba/Bamboo_wallpaper.png` | **Wallpaper padrão do omakuba** (Bamboo, 5K). O descriptor `/usr/share/gnome-background-properties/omakuba-bamboo.xml` faz ele **aparecer em Configurações › Aparência › Fundo de tela** como “Bamboo (omakuba)”. |
 
 ## Configurações gerenciadas por script (não são dotfiles)
 
@@ -19,7 +20,7 @@ instalados pelo passo `90-dotfiles` do `./install.sh` (com backup automático em
 |---|---|---|
 | `~/.config/xdg-terminals.list` | Define o **kitty** como terminal preferido do sistema | `90-dotfiles` |
 | GNOME Terminal (dconf) | Perfil **omakuba**: paleta **Breath** (Manjaro), Nerd Font 12, 8% de transparência, cursor `ibeam`, scrollback 10k — mesmo visual do kitty | `20-terminal` |
-| dconf/gsettings (org.gnome.*) | Yaru preservado (dark), dock clássico refinado (altura total, DOTS, 72% opacidade dinâmica, auto-hide), Blur my Shell, Vitals, 5 workspaces fixos, teclas `Super+1..5`, `Super+Return` → kitty, favoritos do dock, relógio mínimo, desktop sem ícones, wallpaper | `50-gnome` / `60-wallpapers` |
+| dconf/gsettings (org.gnome.*) | Yaru preservado (dark), dock clássico refinado (altura total, DOTS, 72% opacidade dinâmica, auto-hide), Blur my Shell, Vitals, 5 workspaces fixos, teclas `Super+1..5`, `Super+Return` → kitty, favoritos do dock, relógio mínimo, desktop sem ícones, wallpaper **Bamboo** como padrão (claro/escuro/tela de bloqueio) | `50-gnome` / `60-wallpapers` |
 | Extensões do GNOME | Forge, Blur my Shell, Vitals, Caffeine (instaladas em `~/.local/share/gnome-shell/extensions`) | `50-gnome` |
 | Extensões do VS Code | C#, C# Dev Kit, ESLint, Prettier, EditorConfig, Docker, YAML, etc. | `40-vscode` |
 

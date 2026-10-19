@@ -1,7 +1,9 @@
 # ── 60-wallpapers ───────────────────────────────────────────────────────────
-# Wallpapers dinâmicos do repo Chillsmeit/linux-dynamic-wallpapers — o mesmo
-# instalador oficial (full-install-remote.sh), executado sem prompt interativo.
-# Eles aparecem em Configurações › Fundo de tela e variam com o horário do dia.
+# 1) O wallpaper do omakuba — Bamboo — versionado em dotfiles/backgrounds/,
+#    instalado no sistema e registrado para aparecer nas Configurações.
+# 2) O pack de wallpapers dinâmicos do repo Chillsmeit/linux-dynamic-wallpapers,
+#    via instalador oficial (full-install-remote.sh), executado sem prompt
+#    interativo. Tudo aparece em Configurações › Fundo de tela.
 WP_DIR="/usr/share/backgrounds/dynamic-wallpapers"
 
 if [[ -d "$WP_DIR" ]] && [[ -n "$(ls -A "$WP_DIR" 2>/dev/null)" ]]; then
@@ -44,19 +46,69 @@ apply_wallpaper() {
   gsettings set org.gnome.desktop.background picture-uri      "file://${target}"
   gsettings set org.gnome.desktop.background picture-uri-dark "file://${target}"
   gs org.gnome.desktop.background picture-options "zoom"
+  # Cor de fundo/transição na cor do Breath (o papel de parede é sólido).
+  gs org.gnome.desktop.background primary-color   "#1e2229"
+  gs org.gnome.desktop.background secondary-color "#1e2229"
   gsettings set org.gnome.desktop.screensaver picture-uri      "file://${target}" 2>/dev/null || true
   gsettings set org.gnome.desktop.screensaver picture-uri-dark "file://${target}" 2>/dev/null || true
   ok "wallpaper aplicado: $name"
   return 0
 }
 
+# ── Bamboo: o wallpaper do omakuba ──────────────────────────────────────────
+# O original vive versionado em dotfiles/backgrounds/. Instalamos no sistema e
+# criamos o descriptor que faz ele APARECER em Configurações › Aparência ›
+# Fundo de tela (com fundo sólido na cor do Breath).
+BAMBOO_SRC="$ROOT/dotfiles/backgrounds/Bamboo_wallpaper.png"
+BAMBOO_DST="/usr/share/backgrounds/omakuba/Bamboo_wallpaper.png"
+BAMBOO_XML="/usr/share/gnome-background-properties/omakuba-bamboo.xml"
+
+if [[ -f "$BAMBOO_SRC" ]]; then
+  if [[ -f "$BAMBOO_DST" ]] && cmp -s "$BAMBOO_SRC" "$BAMBOO_DST"; then
+    skip "Bamboo já instalado no sistema"
+  else
+    sudo install -Dm644 "$BAMBOO_SRC" "$BAMBOO_DST"
+    ok "Bamboo instalado em $BAMBOO_DST"
+  fi
+
+  tmp_xml="$(mktemp)"
+  cat >"$tmp_xml" <<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Wallpaper do omakuba (Bamboo). Editado por lib/60-wallpapers.sh — não mexa à mão. -->
+<wallpapers>
+  <wallpaper deleted="false">
+    <name>Bamboo (omakuba)</name>
+    <filename>/usr/share/backgrounds/omakuba/Bamboo_wallpaper.png</filename>
+    <filename-dark>/usr/share/backgrounds/omakuba/Bamboo_wallpaper.png</filename-dark>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#1e2229</pcolor>
+    <scolor>#1e2229</scolor>
+  </wallpaper>
+</wallpapers>
+XML
+  if [[ -f "$BAMBOO_XML" ]] && cmp -s "$tmp_xml" "$BAMBOO_XML"; then
+    skip "Bamboo já aparece nas Configurações"
+  else
+    sudo install -Dm644 "$tmp_xml" "$BAMBOO_XML"
+    ok "Bamboo aparece em Configurações › Aparência › Fundo de tela"
+  fi
+  rm -f "$tmp_xml"
+else
+  warn "dotfiles/backgrounds/Bamboo_wallpaper.png ausente (ignorado)"
+fi
+
 if [[ -d /usr/share/gnome-background-properties ]]; then
   chosen=""
-  # Minimalistas primeiro (smooth/dark), os demais como plano B.
-  for pref in BigSur Adwaita Fluent Aura ChromeDeepDarkPurple; do
-    [[ -f "/usr/share/gnome-background-properties/${pref}.xml" ]] || continue
-    if apply_wallpaper "$pref"; then chosen="$pref"; break; fi
-  done
+  # 1º o Bamboo (wallpaper do omakuba); se faltar, os minimalistas do pack.
+  if apply_wallpaper "omakuba-bamboo"; then
+    chosen="Bamboo (omakuba)"
+  else
+    for pref in BigSur Adwaita Fluent Aura ChromeDeepDarkPurple; do
+      [[ -f "/usr/share/gnome-background-properties/${pref}.xml" ]] || continue
+      if apply_wallpaper "$pref"; then chosen="$pref"; break; fi
+    done
+  fi
   if [[ -z "$chosen" ]]; then
     first_xml="$(ls /usr/share/gnome-background-properties/*.xml 2>/dev/null | head -1 || true)"
     if [[ -n "$first_xml" ]]; then
