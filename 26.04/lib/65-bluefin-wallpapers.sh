@@ -1,8 +1,8 @@
 # 65-bluefin-wallpapers
 # Baixa os wallpapers do Bluefin e da Universal Blue direto do repositório
-# ublue-os/artwork. Eles entram na mesma pasta do omakuba e aparecem em
-# Configurações > Aparência > Papel de parede. No fim, o Sunrise da Universal
-# Blue vira o padrão; o green forest fica de reserva no passo 60.
+# ublue-os/artwork. Eles entram na mesma pasta do projeto e aparecem em
+# Configurações > Aparência > Papel de parede. Nenhum é aplicado
+# automaticamente: o seu papel de parede continua e você escolhe depois.
 
 WP_SRC_DIR="${WP_SRC_DIR:-$DOTFILES_DIR/backgrounds}"
 WP_DST_DIR="${WP_DST_DIR:-/usr/share/backgrounds/omakuba}"
@@ -132,8 +132,8 @@ ublue_single "eyes"      "eyes"      "eyes.svg"      "Eyes"
 ublue_single "huntress"  "huntress"  "huntress.jxl"  "Huntress"
 ublue_single "lazy-days" "lazy-days" "lazy-days.jxl" "Lazy Days"
 
-sunrise_xml="$WP_XML_DIR/omakuba-ublue-sunrise.xml"
-
+# Só aplico algo se você pedir explicitamente por OMAKUBA_WALLPAPER. Fora isso,
+# o papel de parede atual fica intocado.
 if [[ -n "${OMAKUBA_WALLPAPER:-}" ]]; then
   wp_override="$OMAKUBA_WALLPAPER"
   [[ -f "$wp_override" ]] || wp_override="$WP_DST_DIR/$OMAKUBA_WALLPAPER"
@@ -149,13 +149,11 @@ if [[ -n "${OMAKUBA_WALLPAPER:-}" ]]; then
   else
     warn "OMAKUBA_WALLPAPER não existe: $OMAKUBA_WALLPAPER"
   fi
-elif [[ -f "$sunrise_xml" ]]; then
-  wallpaper_apply_xml "$sunrise_xml" \
-    && ok "padrão aplicado: Universal Blue: Sunrise" \
-    || warn "não consegui aplicar o Sunrise"
+else
+  skip "não apliquei wallpaper; o seu continua e a galeria nova fica para depois"
 fi
 
 info "os wallpapers do Bluefin e da Universal Blue ficam em $WP_DST_DIR."
-info "o padrão é o Sunrise da Universal Blue; o green forest fica de reserva."
-info "para escolher outro: OMAKUBA_WALLPAPER=... ./install.sh 60-wallpapers"
+info "para aplicar um: Configurações > Aparência > Papel de parede"
+info "ou OMAKUBA_WALLPAPER=... ./install.sh 60-wallpapers"
 info "o cache dos downloads fica em $WP_CACHE_DIR."

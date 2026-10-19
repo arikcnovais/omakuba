@@ -22,6 +22,7 @@ ALL_STEPS=(
   "00-base"
   "05-store"
   "10-fonts"
+  "15-branding"
   "20-terminal"
   "30-dev"
   "40-vscode"
@@ -50,12 +51,13 @@ usage() {
     00-base        ferramentas do dia a dia via APT, Docker e lazygit
     05-store       remove a Snap Store e deixa o Bazaar como loja gráfica
     10-fonts       JetBrainsMono Nerd Font
+    15-branding    os-release com marca configurável, logo do Bluefin e fastfetch
     20-terminal    Kitty, Zsh, Starship, plugins do Zsh e ajustes no GNOME Terminal
     30-dev         Node LTS, pnpm, yarn, .NET e ferramentas do dotnet
     40-vscode      instala o VS Code, extensões e settings
-    50-gnome       extensões do Bluefin, dock do Ubuntu e ajustes de aparência
-    60-wallpapers  instala os wallpapers de dotfiles/backgrounds e aplica o padrão
-    65-bluefin-wallpapers  baixa os wallpapers do Bluefin e da Universal Blue
+    50-gnome       extensões, dock, Adwaita, adw-gtk3, auto tema e ajustes
+    60-wallpapers  instala e registra os wallpapers de dotfiles/backgrounds
+    65-bluefin-wallpapers  baixa e registra os wallpapers do Bluefin e da Universal Blue
     70-flatpaks    Flathub, Bazaar, Flatseal, Mission Center e os apps do Bluefin
     75-cli         Homebrew e o pacote de ferramentas de linha de comando
     80-dx          camada DX do Bluefin, só com OMAKUBA_DX=1

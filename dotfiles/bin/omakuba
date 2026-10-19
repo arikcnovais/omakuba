@@ -24,6 +24,7 @@ omakuba
   omakuba dock off          desliga o dock (fica só a visão geral)
   omakuba dock status       mostra se o dock está ligado
   omakuba store             abre o Bazaar, a loja do omakuba
+  omakuba fetch             mostra o fastfetch com a cara do omakuba
   omakuba doctor            mostra versões e o estado do ambiente
   omakuba help              esta ajuda
 
@@ -105,6 +106,14 @@ cmd_store() {
   printf 'abrindo o Bazaar...\n'
 }
 
+cmd_fetch() {
+  if command -v omakuba-fastfetch >/dev/null 2>&1; then
+    exec omakuba-fastfetch "$@"
+  fi
+  printf 'o fastfetch do omakuba ainda não está instalado. Rode: ./install.sh 15-branding\n' >&2
+  return 1
+}
+
 pretty_version() {
   local cmd="$1"
   if command -v "$cmd" >/dev/null 2>&1; then
@@ -115,13 +124,18 @@ pretty_version() {
 }
 
 cmd_doctor() {
-  printf '%-18s %s\n' "Ubuntu" "$(. /etc/os-release 2>/dev/null; printf '%s' "${PRETTY_NAME:-?}")"
+  printf '%-18s %s\n' "Sistema" "$(. /etc/os-release 2>/dev/null; printf '%s' "${PRETTY_NAME:-?}")"
+  printf '%-18s %s\n' "Base" "$(. /usr/lib/os-release 2>/dev/null; printf '%s' "${PRETTY_NAME:-?}")"
   printf '%-18s %s\n' "GNOME" "$(pretty_version gnome-shell)"
   printf '%-18s %s\n' "Flatpak" "$(pretty_version flatpak)"
   printf '%-18s %s\n' "Homebrew" "$(pretty_version brew)"
   printf '%-18s %s\n' "Docker" "$(pretty_version docker)"
   printf '%-18s %s\n' "Podman" "$(pretty_version podman)"
   printf '%-18s %s\n' "VS Code" "$(pretty_version code)"
+  local term_default
+  term_default="$(xdg-terminal-exec --print-id 2>/dev/null || true)"
+  [[ -n "$term_default" ]] || term_default="$(readlink -f /usr/bin/x-terminal-emulator 2>/dev/null || echo ausente)"
+  printf '%-18s %s\n' "Terminal" "$term_default"
   if command -v snap >/dev/null 2>&1 && snap list snap-store >/dev/null 2>&1; then
     printf '%-18s %s\n' "Snap Store" "instalada (rode ./install.sh 05-store)"
   else
@@ -147,6 +161,7 @@ case "${1:-help}" in
   update) shift; cmd_update "$@" ;;
   dock)   shift; cmd_dock "$@" ;;
   store)  shift; cmd_store "$@" ;;
+  fetch)  shift; cmd_fetch "$@" ;;
   doctor) cmd_doctor ;;
   help|-h|--help|"") usage ;;
   *)

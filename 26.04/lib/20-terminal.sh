@@ -1,6 +1,6 @@
 # 20-terminal
 # Kitty, Zsh, Starship e os plugins do Zsh. No 26.04 o terminal padrão do
-# Ubuntu é o Ptyxis, então também dou uma ajustada nele.
+# Ubuntu é o Ptyxis, então também reforço ele como padrão e ajusto o visual.
 apt_install kitty zsh
 
 # Starship pelo instalador oficial.
@@ -60,6 +60,11 @@ if command -v ptyxis >/dev/null; then
     gs "$PTX" opacity 0.92
     gs "$PTX" scrollback-lines 10000
   fi
+
+  # Ptyxis como terminal padrão do sistema: garanto a alternativa
+  # x-terminal-emulator (que o kitty poderia roubar num upgrade), o handler de
+  # x-scheme-handler/terminal e o topo do xdg-terminals.list.
+  set_default_terminal "$(command -v ptyxis)" "org.gnome.Ptyxis.desktop"
 
   # O Adwaita não traz ícone do Ptyxis. O hicolor serve de fallback para todos
   # os temas, então o logo novo entra lá.

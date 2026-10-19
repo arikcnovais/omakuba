@@ -111,6 +111,14 @@ alias dpa="docker ps -a"
 alias kgp="kubectl get pods -A"  # só faz sentido se tiver k8s
 alias lg="lazygit"
 
+# fastfetch com a cara do omakuba: layout do Bluefin, logo do Bluefin e a cor
+# do acento do GNOME. Quem instala é o passo 15-branding.
+if command -v omakuba-fastfetch >/dev/null 2>&1; then
+  alias fastfetch="omakuba-fastfetch"
+  alias neofetch="omakuba-fastfetch"
+  alias neowofetch="omakuba-fastfetch"
+fi
+
 # Plugins
 ZSH_PLUGIN_DIR="$HOME/.local/share/zsh/plugins"
 if [[ -f "$ZSH_PLUGIN_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then

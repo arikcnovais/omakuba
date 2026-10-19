@@ -16,6 +16,8 @@ GSCONNECT_UUID="gsconnect@andyholmes.github.io"
 SEARCHLIGHT_UUID="search-light@icedman.github.com"
 LOGOMENU_UUID="logomenu@aryan_k"
 CUSTOMCMD_UUID="custom-command-list@storageb.github.com"
+ACCENT_DIRS_UUID="accent-directories@taiwbi.com"
+LEGACY_THEME_UUID="legacyschemeautoswitcher@joshimukul29.gmail.com"
 FORGE_UUID="forge@jmmaranan.com"
 
 STATE_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/omakuba"
@@ -37,6 +39,22 @@ install_extension "$SEARCHLIGHT_UUID"
 install_extension "$LOGOMENU_UUID"
 install_extension_git "$CUSTOMCMD_UUID" "StorageB/custom-command-menu" "main"
 
+# Accent Icons: as pastas acompanham a cor do acento. A extensão só existe
+# para GNOME 47+, então no 24.04 (GNOME 46) eu pulo.
+ACCENT_DIRS=0
+shell_major="$(gnome-shell --version 2>/dev/null | grep -oE '[0-9]+' | sed -n '1p' || true)"
+if [[ -n "$shell_major" ]] && (( shell_major >= 47 )); then
+  ACCENT_DIRS=1
+  install_extension "$ACCENT_DIRS_UUID"
+else
+  skip "Accent Icons: só existe para GNOME 47+ (pulei)"
+fi
+
+# Legacy (GTK3) Theme Scheme Auto Switcher: segue o claro/escuro do sistema e
+# troca o tema GTK3 entre adw-gtk3 e adw-gtk3-dark. Vai do GNOME 45 ao 51, então
+# entra nas duas versões; não tem schema, é só instalar e ligar.
+install_extension "$LEGACY_THEME_UUID"
+
 # O Bazaar Companion e a extensão do Gradia só existem para GNOME 49 ou mais
 # novo. Os apps entram pelo Flatpak no passo 70.
 skip "Bazaar Companion: só existe para GNOME 49 ou mais novo (pulei)"
@@ -52,7 +70,9 @@ WANT=(
   "$LOGOMENU_UUID"
   "$CUSTOMCMD_UUID"
   "$FORGE_UUID"
+  "$LEGACY_THEME_UUID"
 )
+[[ "$ACCENT_DIRS" -eq 1 ]] && WANT+=("$ACCENT_DIRS_UUID")
 [[ "$DOCK_DISABLED" -eq 0 ]] && WANT+=("$DOCK_UUID")
 
 # O tiling-assistant do Ubuntu briga com o Forge.
@@ -67,9 +87,106 @@ done
 # O tiling-assistant do Ubuntu fica desligado para não brigar com o Forge.
 gnome-extensions disable "tiling-assistant@ubuntu.com" >/dev/null 2>&1 || true
 
+# adw-gtk3: deixa os apps GTK3 com a mesma cara dos apps libadwaita (o
+# "Adwaita novo"). Não existe no apt do Ubuntu, então vem do release do GitHub
+# direto para /usr/share/themes. Só precisa de sudo para escrever lá.
+ADW_THEME="adw-gtk3-dark"
+ADW_DIR="${THEMES_DIR:-/usr/share/themes}"
+
+if [[ -d "$ADW_DIR/adw-gtk3" && -d "$ADW_DIR/adw-gtk3-dark" ]]; then
+  skip "adw-gtk3 já está em $ADW_DIR"
+else
+  if apt-cache show adw-gtk3 >/dev/null 2>&1; then
+    apt_install adw-gtk3 || warn "não instalei o adw-gtk3 pelo apt (tento o GitHub)"
+  fi
+  if [[ ! -d "$ADW_DIR/adw-gtk3" ]]; then
+    adw_tmp="$(mktemp -d)"
+    adw_tag="$(github_latest_tag lassekongo83/adw-gtk3 || true)"
+    adw_url="https://github.com/lassekongo83/adw-gtk3/releases/download/${adw_tag}/adw-gtk3${adw_tag}.tar.xz"
+    if [[ -n "$adw_tag" ]] && run_quiet "baixando o adw-gtk3" fetch "$adw_url" "$adw_tmp/adw.tar.xz"; then
+      if sudo mkdir -p "$ADW_DIR" && sudo tar -xJf "$adw_tmp/adw.tar.xz" -C "$ADW_DIR"; then
+        ok "adw-gtk3 instalado em $ADW_DIR"
+      else
+        warn "não consegui extrair o adw-gtk3 em $ADW_DIR (pulei)"
+      fi
+    else
+      warn "não baixei o adw-gtk3 (pulei)"
+    fi
+    rm -rf "$adw_tmp"
+  fi
+fi
+
 # Visual: Adwaita puro, só ajeito alguns detalhes.
-gs org.gnome.desktop.interface gtk-theme    "Adwaita-dark"
+if [[ -d "$ADW_DIR/$ADW_THEME" ]]; then
+  gs org.gnome.desktop.interface gtk-theme "$ADW_THEME"
+  ok "tema GTK3: $ADW_THEME (a cara do Adwaita nos apps antigos)"
+else
+  gs org.gnome.desktop.interface gtk-theme "Adwaita-dark"
+  warn "adw-gtk3 ausente; mantive o Adwaita-dark"
+fi
 gs org.gnome.desktop.interface icon-theme   "Adwaita"
+
+# O mesmo tema para os snaps. Os apps em snap (Firefox, Thunderbird...) leem os
+# temas do snap gtk-common-themes, que não traz o adw-gtk3. Instalo o
+# adw-gtk3-theme e ligo o plug gtk-3-themes de cada app que usa o
+# gtk-common-themes também nesse snap. A conexão com o gtk-common-themes fica,
+# então ícones, sons e os outros temas continuam disponíveis.
+if ! command -v snap >/dev/null 2>&1; then
+  skip "snapd não está instalado (pulei o tema dos snaps)"
+else
+  snap_install adw-gtk3-theme || true
+  if snap list adw-gtk3-theme >/dev/null 2>&1; then
+    snap_changed=0
+    while IFS= read -r plug; do
+      [[ -n "$plug" ]] || continue
+      if snap connections 2>/dev/null | grep -qE "[[:space:]]${plug}[[:space:]].*adw-gtk3-theme:gtk-3-themes"; then
+        skip "$plug já vê o adw-gtk3"
+        continue
+      fi
+      if run_quiet "ligando $plug ao adw-gtk3-theme" sudo snap connect "$plug" adw-gtk3-theme:gtk-3-themes; then
+        ok "$plug agora vê o adw-gtk3"
+        snap_changed=1
+      else
+        warn "não liguei $plug ao adw-gtk3-theme (pulei)"
+      fi
+    done < <(snap connections 2>/dev/null \
+      | grep 'gtk-common-themes:gtk-3-themes' \
+      | grep -oE '[a-zA-Z0-9@._-]+:gtk-3-themes' \
+      | grep -v '^gtk-common-themes:' | sort -u || true)
+    if [[ "$snap_changed" -eq 1 ]]; then
+      ok "reabra os apps em snap para pegar o tema"
+    fi
+  fi
+fi
+
+# O painel "Ubuntu Desktop" das Configurações usa o ícone
+# preferences-ubuntu-panel, que só existe no Yaru. Como o tema de ícones é o
+# Adwaita, copio só esse ícone para o hicolor (que o Adwaita herda), sem
+# aplicar o Yaru. Vai com os dois nomes para funcionar em qualquer versão do
+# g-c-c.
+YARU_PANEL_ICON="/usr/share/icons/Yaru/scalable/categories/preferences-ubuntu-panel-symbolic.svg"
+HICOLOR_ROOT="${HICOLOR_DIR:-/usr/share/icons/hicolor}"
+HICOLOR_CATEGORIES="$HICOLOR_ROOT/scalable/categories"
+if [[ -f "$YARU_PANEL_ICON" ]]; then
+  YARU_PANEL_CHANGED=0
+  for name in preferences-ubuntu-panel-symbolic.svg preferences-ubuntu-panel.svg; do
+    dst="$HICOLOR_CATEGORIES/$name"
+    if [[ -f "$dst" ]] && cmp -s "$YARU_PANEL_ICON" "$dst"; then
+      skip "ícone do painel Ubuntu já está em $dst"
+    elif run_quiet "instalando o ícone do painel Ubuntu" sudo install -Dm644 "$YARU_PANEL_ICON" "$dst"; then
+      ok "ícone do painel Ubuntu em $dst"
+      YARU_PANEL_CHANGED=1
+    else
+      warn "não instalei o ícone do painel Ubuntu em $dst (pulei)"
+    fi
+  done
+  if [[ "$YARU_PANEL_CHANGED" -eq 1 ]] && command -v gtk-update-icon-cache >/dev/null 2>&1; then
+    sudo gtk-update-icon-cache -f -t "$HICOLOR_ROOT" >/dev/null 2>&1 || true
+  fi
+else
+  skip "ícone preferences-ubuntu-panel não está no Yaru (pulei)"
+fi
+
 gs org.gnome.desktop.interface cursor-theme "Adwaita"
 gs org.gnome.desktop.interface color-scheme "prefer-dark"
 gs org.gnome.desktop.interface clock-show-weekday true
@@ -154,20 +271,27 @@ else
   ext_gs "$BLUR_UUID" org.gnome.shell.extensions.blur-my-shell.dash-to-dock blur false
   ext_gs "$BLUR_UUID" org.gnome.shell.extensions.blur-my-shell.dash-to-dock static-blur false
 fi
-# Popups: quero os cantos arredondados, senão fica quadrado e com uns encaixes
-# estranhos. Nas versões que têm o pipeline "Default rounded" aponto para ele.
-# Nas mais novas, que arredondam por chave, rounded-corners 0 quer dizer
+# Popups: o pipeline "Default rounded" é o padrão, senão os cantos ficam
+# quadrados e com uns encaixes estranhos. O blur_has_pipeline antigo checava a
+# lista de pipelines personalizados e dava falso para os de fábrica, então agora
+# eu só confiro se a chave existe e aponto direto para o rounded.
+# Nas versões mais novas, que arredondam por chave, rounded-corners 0 quer dizer
 # "os quatro cantos" e o raio vem de corner-radius.
 ext_gs "$BLUR_UUID" org.gnome.shell.extensions.blur-my-shell.popup blur true
-if blur_has_pipeline "$BLUR_UUID" "pipeline_default_rounded"; then
+if ext_has_key "$BLUR_UUID" org.gnome.shell.extensions.blur-my-shell.popup pipeline; then
   ext_gs "$BLUR_UUID" org.gnome.shell.extensions.blur-my-shell.popup pipeline "'pipeline_default_rounded'"
 else
   ext_gs "$BLUR_UUID" org.gnome.shell.extensions.blur-my-shell.popup rounded-corners 0
   ext_gs "$BLUR_UUID" org.gnome.shell.extensions.blur-my-shell.popup corner-radius 18
 fi
+# Blur estático: o fundo é capturado uma vez e reaproveitado, em vez de refazer
+# o blur a cada frame. Fica mais leve e o popup não cintila ao abrir.
+if ext_has_key "$BLUR_UUID" org.gnome.shell.extensions.blur-my-shell.popup static-blur; then
+  ext_gs "$BLUR_UUID" org.gnome.shell.extensions.blur-my-shell.popup static-blur true
+fi
 ext_gs "$BLUR_UUID" org.gnome.shell.extensions.blur-my-shell.overview blur true
 ext_gs "$BLUR_UUID" org.gnome.shell.extensions.blur-my-shell.applications blur false
-ok "Blur my Shell: barra e visão geral com blur, dock reto e popups arredondados"
+ok "Blur my Shell: barra e visão geral com blur, dock reto e popups arredondados com blur estático"
 
 # Vitals: só CPU, memória, disco e rede.
 ext_gs "$VITALS_UUID" org.gnome.shell.extensions.vitals show-processor true
@@ -235,6 +359,23 @@ if ext_installed "$CUSTOMCMD_UUID"; then
   ext_gs "$CUSTOMCMD_UUID" org.gnome.shell.extensions.custom-command-list command7 "('Sobre o sistema', 'gnome-control-center system about', 'help-about-symbolic', true)"
   ext_gs "$CUSTOMCMD_UUID" org.gnome.shell.extensions.custom-command-list command8 "('Atualizar apps', '$HOME/.local/bin/omakuba update', 'software-update-available-symbolic', true)"
   ok "Custom Command Menu: comandos rápidos na direita da barra"
+fi
+
+# Accent Icons: só as pastas mudam de cor; os ícones dos apps continuam no
+# Adwaita. Para colorir os apps também, ligue change-app-colors nas preferências
+# da extensão.
+if [[ "$ACCENT_DIRS" -eq 1 ]] && ext_installed "$ACCENT_DIRS_UUID"; then
+  ext_gs "$ACCENT_DIRS_UUID" org.gnome.shell.extensions.accent-directories change-app-colors false
+  ok "Accent Icons: pastas acompanham a cor do acento"
+
+  # Se a extensão já rodou alguma vez, ela instalou os temas coloridos no home.
+  # Aí eu já deixo o icon-theme certo, para um rerun não ficar no Adwaita.
+  accent_now="$(gsettings get org.gnome.desktop.interface accent-color 2>/dev/null | tr -d "'")"
+  accent_theme="$(ext_get "$ACCENT_DIRS_UUID" org.gnome.shell.extensions.accent-directories "${accent_now:-slate}-theme" || true)"
+  if [[ -n "$accent_theme" && -d "$HOME/.local/share/icons/$accent_theme" ]]; then
+    gs org.gnome.desktop.interface icon-theme "$accent_theme"
+    ok "ícones no tema do acento: $accent_theme"
+  fi
 fi
 
 # Workspaces fixos, como no i3. Super+1..5 troca, com Shift manda a janela.

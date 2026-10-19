@@ -30,7 +30,9 @@ gs() {
   if gsettings list-keys "$schema" 2>/dev/null | grep -xF "$key" >/dev/null; then
     gsettings set "$schema" "$key" "$value" 2>/dev/null \
       || warn "gsettings: valor inválido em '$schema' '$key' (ignorei)"
-  else
+  elif [[ "${OMAKUBA_VERBOSE:-0}" == "1" ]]; then
+    # Chave que não existe é normal entre versões do GNOME (o 46 não tem
+    # accent-color, por exemplo). Só incomoda em modo detalhado.
     warn "gsettings: '$key' não existe em '$schema' (ignorei)"
   fi
 }
@@ -50,6 +52,7 @@ wallpaper_file_uri() {
 # dia/noite é o mesmo que o Bluefin usa nos wallpapers da Universal Blue.
 wallpaper_set_uri() {
   local day="$1" night="${2:-$1}" label="${3:-papel de parede}"
+  command -v gsettings >/dev/null 2>&1 || return 1
   [[ -f "$day" ]] || return 1
   [[ -f "$night" ]] || night="$day"
 
@@ -133,11 +136,95 @@ backup_file() {
   skip "backup: $file -> $BACKUP_DIR$file"
 }
 
+# install_user_file <origem> <destino> [modo]
+# Copia um arquivo para o home do usuário, com backup se já existir. Nunca usa
+# sudo; é o helper que os dotfiles e o branding compartilham.
+install_user_file() {
+  local src="$1" dest="$2" mode="${3:-644}"
+  if [[ ! -f "$src" ]]; then
+    warn "arquivo ausente: $src (pulei)"
+    return 0
+  fi
+  mkdir -p "$(dirname "$dest")"
+  if [[ -f "$dest" ]] && cmp -s "$src" "$dest"; then
+    if [[ "$mode" != "755" || -x "$dest" ]]; then
+      skip "igual, não mexi: $dest"
+      return 0
+    fi
+  fi
+  [[ -e "$dest" ]] && backup_file "$dest"
+  install -Dm"$mode" "$src" "$dest"
+  ok "copiado: $dest"
+}
+
 # fetch <url> <destino>
 # Download com algumas tentativas e tempo limite.
 fetch() {
   local url="$1" dest="$2"
   curl -fsSL --retry 3 --retry-delay 2 --max-time 180 "$url" -o "$dest"
+}
+
+# set_preferred_terminal <desktop-id>
+# Coloca o desktop no topo do ~/.config/xdg-terminals.list, que é o que o
+# xdg-terminal-exec lê. O primeiro da lista que estiver instalado vence.
+set_preferred_terminal() {
+  local id="$1" list="${XDG_CONFIG_HOME:-$HOME/.config}/xdg-terminals.list"
+  mkdir -p "$(dirname "$list")"
+  if [[ -f "$list" ]] && [[ "$(sed -n '1p' "$list")" == "$id" ]]; then
+    skip "$id já é o terminal preferido"
+    return 0
+  fi
+  [[ -f "$list" ]] && backup_file "$list"
+  {
+    printf '%s\n' "$id"
+    [[ -f "$list" ]] && grep -vxE 'kitty(\.desktop)?|org\.gnome\.Ptyxis\.desktop|org\.gnome\.Terminal\.desktop' "$list" || true
+  } > "$list.tmp"
+  mv "$list.tmp" "$list"
+  ok "$id marcado como terminal preferido"
+}
+
+# set_default_terminal <binário> <desktop-id>
+# Deixa o binário como x-terminal-emulator (alternativa do sistema), o app
+# como handler de x-scheme-handler/terminal e no topo do xdg-terminals.list.
+set_default_terminal() {
+  local bin="$1" desktop="$2" link="${XTERM_LINK:-/usr/bin/x-terminal-emulator}"
+
+  if [[ -x "$bin" ]] && update-alternatives --query x-terminal-emulator >/dev/null 2>&1; then
+    if [[ "$(readlink -f "$link" 2>/dev/null || true)" == "$(readlink -f "$bin")" ]]; then
+      skip "x-terminal-emulator já é $bin"
+    elif run_quiet "definindo $(basename "$bin") como terminal padrão" \
+         sudo update-alternatives --set x-terminal-emulator "$bin"; then
+      ok "x-terminal-emulator agora é $bin"
+    else
+      warn "não consegui forçar o x-terminal-emulator (pulei)"
+    fi
+  fi
+
+  if command -v xdg-mime >/dev/null 2>&1; then
+    if [[ "$(xdg-mime query default x-scheme-handler/terminal 2>/dev/null || true)" == "$desktop" ]]; then
+      skip "$desktop já é o handler de terminal"
+    elif xdg-mime default "$desktop" x-scheme-handler/terminal 2>/dev/null; then
+      ok "$desktop definido para x-scheme-handler/terminal"
+    else
+      warn "não defini o handler de terminal (pulei)"
+    fi
+  fi
+
+  set_preferred_terminal "$desktop"
+}
+
+# github_latest_tag <usuario/repo>
+# Última tag de release do GitHub. Usa o jq quando existe e cai no sed quando
+# não, para não depender dele.
+github_latest_tag() {
+  local repo="$1" json
+  json="$(fetch "https://api.github.com/repos/$repo/releases/latest" /dev/stdout 2>/dev/null || true)"
+  [[ -n "$json" ]] || return 1
+  if command -v jq >/dev/null 2>&1; then
+    printf '%s' "$json" | jq -r '.tag_name // empty' 2>/dev/null
+  else
+    printf '%s' "$json" | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' | sed -n '1p'
+  fi
 }
 
 # run_quiet <mensagem> <comando...>
@@ -211,13 +298,13 @@ ext_has_key() {
   GSETTINGS_SCHEMA_DIR="$dir/schemas" gsettings list-keys "$2" 2>/dev/null | grep -xF "$3" >/dev/null
 }
 
-# blur_has_pipeline <uuid> <nome>
-blur_has_pipeline() {
+# ext_get <uuid> <schema> <chave>
+# Lê uma chave da extensão (sem as aspas do gsettings).
+ext_get() {
   local dir="$HOME/.local/share/gnome-shell/extensions/$1"
   [[ -d "$dir/schemas" ]] || return 1
   ext_compile_schemas "$1"
-  GSETTINGS_SCHEMA_DIR="$dir/schemas" gsettings get org.gnome.shell.extensions.blur-my-shell pipelines 2>/dev/null \
-    | grep -F "'$2'" >/dev/null
+  GSETTINGS_SCHEMA_DIR="$dir/schemas" gsettings get "$2" "$3" 2>/dev/null | tr -d "'"
 }
 
 # persist_extensions <uuid-para-desligar-separados-por-virgula> <uuid...>
@@ -266,6 +353,26 @@ flatpak_install() {
       warn "não consegui instalar o flatpak '$app' (pulei)"
     fi
   done
+}
+
+# snap_install <nome> [canal]
+# Instala um snap do sistema e pula o que já está instalado. O snapd só aceita
+# escrever como root, então vai de sudo.
+snap_install() {
+  local name="$1" channel="${2:-}"
+  if ! command -v snap >/dev/null 2>&1; then
+    warn "snapd não está instalado; não instalei o snap '$name' (pulei)"
+    return 1
+  fi
+  if snap list "$name" >/dev/null 2>&1; then
+    skip "snap $name já está instalado"
+    return 0
+  fi
+  local args=(install "$name")
+  if [[ -n "$channel" ]]; then
+    args+=(--channel "$channel")
+  fi
+  run_quiet "instalando o snap $name" sudo snap "${args[@]}"
 }
 
 # install_extension_git <uuid> <usuario/repo> [branch]

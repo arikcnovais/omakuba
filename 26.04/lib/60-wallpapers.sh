@@ -1,8 +1,9 @@
 # 60-wallpapers
 # Pega as imagens que você deixar em dotfiles/backgrounds/ e instala todas no
 # sistema, criando o XML que faz cada uma aparecer em Configurações, Aparência,
-# Papel de parede. O padrão é o Sunrise da Universal Blue; o green forest fica
-# de reserva para quando o passo 65 ainda não baixou os wallpapers do Bluefin.
+# Papel de parede. Nenhum wallpaper é aplicado: o seu fica como está e você
+# escolhe outro quando quiser. OMAKUBA_WALLPAPER é a única exceção, porque aí a
+# escolha é explícita.
 
 WP_SRC_DIR="${WP_SRC_DIR:-$DOTFILES_DIR/backgrounds}"
 WP_DST_DIR="${WP_DST_DIR:-/usr/share/backgrounds/omakuba}"
@@ -34,9 +35,6 @@ xml_escape() {
   printf '%s' "$1" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g'
 }
 
-green_xml=""
-bamboo_xml=""
-first_xml=""
 count=0
 
 if [[ ! -d "$WP_SRC_DIR" ]]; then
@@ -81,10 +79,6 @@ XML
       ok "$name aparece em Configurações > Aparência > Papel de parede"
     fi
     rm -f "$tmp_xml"
-
-    [[ -z "$first_xml" ]] && first_xml="$xml"
-    [[ "$slug" == green-forest* ]] && green_xml="$xml"
-    [[ "$slug" == bamboo* ]] && bamboo_xml="$xml"
   done
   shopt -u nullglob nocaseglob
 
@@ -93,8 +87,8 @@ XML
   fi
 fi
 
-sunrise_xml="$WP_XML_DIR/omakuba-ublue-sunrise.xml"
-
+# Não aplico nada por padrão: o papel de parede que já está configurado
+# continua sendo o seu. A galeria nova fica só registrada, para escolher depois.
 if [[ -n "${OMAKUBA_WALLPAPER:-}" ]]; then
   wp_override="$OMAKUBA_WALLPAPER"
   [[ -f "$wp_override" ]] || wp_override="$WP_DST_DIR/$OMAKUBA_WALLPAPER"
@@ -110,16 +104,18 @@ if [[ -n "${OMAKUBA_WALLPAPER:-}" ]]; then
   else
     warn "OMAKUBA_WALLPAPER não existe: $OMAKUBA_WALLPAPER"
   fi
-elif [[ -f "$sunrise_xml" ]]; then
-  wallpaper_apply_xml "$sunrise_xml" \
-    || warn "não consegui aplicar o Sunrise"
 else
-  chosen="${green_xml:-${bamboo_xml:-$first_xml}}"
-  if [[ -n "$chosen" ]]; then
-    wallpaper_apply_xml "$chosen" || warn "não consegui aplicar o wallpaper padrão"
+  current_uri=""
+  if command -v gsettings >/dev/null 2>&1; then
+    current_uri="$(gsettings get org.gnome.desktop.background picture-uri 2>/dev/null || true)"
+  fi
+  if [[ -n "$current_uri" && "$current_uri" != "''" ]]; then
+    skip "mantive o seu papel de parede"
+  else
+    info "nenhum papel de parede aplicado; escolha um em Configurações > Aparência"
   fi
 fi
 
-info "o padrão é o Sunrise da Universal Blue; o green forest fica de reserva"
-info "para escolher outro: OMAKUBA_WALLPAPER=/caminho/da/imagem ./install.sh 60-wallpapers"
+info "os wallpapers aparecem em Configurações > Aparência > Papel de parede"
+info "para aplicar um agora: OMAKUBA_WALLPAPER=/caminho/da/imagem ./install.sh 60-wallpapers"
 info "os wallpapers do Bluefin e da Universal Blue entram no passo 65-bluefin-wallpapers"

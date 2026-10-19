@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+#
+# omakuba-fastfetch
+# O fastfetch com a cara do omakuba: o layout do Bluefin, o logo do Bluefin
+# (sorteado a cada execução) e as cores seguindo o acento do GNOME, igual o
+# Bluefin faz. Fica no ~/.local/bin e é o que o alias "fastfetch" chama.
+#
+set -euo pipefail
+
+# O fastfetch pode estar no sistema (APT, no 26.04) ou no home (binário do
+# GitHub, caminho do 24.04). Garante que o do home seja encontrado.
+if ! command -v fastfetch >/dev/null 2>&1 && [[ -x "$HOME/.local/bin/fastfetch" ]]; then
+  PATH="$HOME/.local/bin:$PATH"
+  export PATH
+fi
+if ! command -v fastfetch >/dev/null 2>&1; then
+  printf 'fastfetch não encontrado. Instale o fastfetch (no omakuba: ./install.sh 15-branding).\n' >&2
+  exit 0
+fi
+
+SETTINGS="${XDG_CONFIG_HOME:-$HOME/.config}/omakuba/fastfetch.json"
+DEFAULT_LOGO_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/omakuba/branding/logos/symbols"
+
+# setting <chave> <padrão>
+setting() {
+  local key="$1" fallback="$2" value=""
+  if [[ -r "$SETTINGS" ]] && command -v jq >/dev/null 2>&1; then
+    value="$(jq -r --arg k "$key" '.[$k] // empty' "$SETTINGS" 2>/dev/null || true)"
+  fi
+  if [[ -n "$value" && "$value" != "null" ]]; then
+    printf '%s' "$value"
+  else
+    printf '%s' "$fallback"
+  fi
+}
+
+FASTFETCH_CONFIG="$(setting fastfetch-config "$HOME/.config/fastfetch/config.jsonc")"
+SHUFFLE_LOGO="$(setting shuffle-logo "true")"
+LOGO_DIRECTORY="$(setting logo-directory "$DEFAULT_LOGO_DIR")"
+DEFAULT_THEME="$(setting default-theme "slate")"
+
+# A cor vem do acento do GNOME, como no Bluefin. Se você trocar o acento em
+# Configurações, o fastfetch acompanha. Dá para forçar com FASTFETCH_THEME=blue
+# (ou green, purple, slate...). OMAKUBA_FASTFETCH_THEME e FASTFETCH_FORCE_THEME
+# continuam valendo como apelidos.
+THEME=""
+if command -v dconf >/dev/null 2>&1; then
+  THEME="$(dconf read /org/gnome/desktop/interface/accent-color 2>/dev/null || true)"
+fi
+if [[ -z "$THEME" ]] && command -v gsettings >/dev/null 2>&1; then
+  THEME="$(gsettings get org.gnome.desktop.interface accent-color 2>/dev/null || true)"
+fi
+THEME="${THEME//\'/}"
+THEME="${THEME//\"/}"
+THEME="${FASTFETCH_THEME:-${OMAKUBA_FASTFETCH_THEME:-${FASTFETCH_FORCE_THEME:-${THEME:-$DEFAULT_THEME}}}}}"
+
+FASTFETCH_COLOR="38;2;53;132;228"
+case "$THEME" in
+  blue)   FASTFETCH_COLOR="38;2;53;132;228" ;;
+  green)  FASTFETCH_COLOR="38;2;58;148;74" ;;
+  orange) FASTFETCH_COLOR="38;2;237;91;0" ;;
+  pink)   FASTFETCH_COLOR="38;2;213;97;153" ;;
+  purple) FASTFETCH_COLOR="38;2;139;62;165" ;;
+  red)    FASTFETCH_COLOR="38;2;230;45;66" ;;
+  slate)  FASTFETCH_COLOR="38;2;111;131;150" ;;
+  teal)   FASTFETCH_COLOR="38;2;33;144;164" ;;
+  yellow) FASTFETCH_COLOR="38;2;200;136;0" ;;
+esac
+
+args=()
+if [[ -r "$FASTFETCH_CONFIG" ]]; then
+  args+=(--config "$FASTFETCH_CONFIG")
+else
+  printf 'aviso: %s não existe; usando a config padrão do fastfetch.\n' "$FASTFETCH_CONFIG" >&2
+fi
+args+=(--color "$FASTFETCH_COLOR")
+if [[ "$SHUFFLE_LOGO" == "true" && -d "$LOGO_DIRECTORY" ]]; then
+  logo="$(find "$LOGO_DIRECTORY" -maxdepth 1 -type f 2>/dev/null | shuf -n 1 || true)"
+  [[ -n "$logo" ]] && args+=(--logo "$logo")
+fi
+
+exec fastfetch "${args[@]}" "$@"

@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+#
+# omakuba-image-info
+# Uma linha com a identidade do sistema, no lugar do ublue-image-info.sh do
+# Bluefin. Lê o /etc/os-release (que o passo 15-branding deixa com a marca) e o
+# /usr/lib/os-release (que continua sendo o da base), para mostrar as duas
+# coisas de uma vez.
+#
+# Nada aqui é cravado: o nome e a versão saem do os-release, então o script
+# serve para qualquer sistema renomeado, não só o omakuba.
+#
+set -u
+
+os_field() { # arquivo chave
+  ( . "$1" 2>/dev/null; printf '%s' "${!2:-}" )
+}
+
+# O /etc/os-release é o que o branding grava; se ele não existir, cai no da
+# base. A base é sempre o /usr/lib/os-release.
+ETC="/etc/os-release"
+BASE_FILE="/usr/lib/os-release"
+
+NAME="$(os_field "$ETC" NAME)"
+[[ -n "$NAME" ]] || NAME="$(os_field "$BASE_FILE" NAME)"
+[[ -n "$NAME" ]] || NAME="Linux"
+
+VERSION_ID="$(os_field "$ETC" VERSION_ID)"
+[[ -n "$VERSION_ID" ]] || VERSION_ID="$(os_field "$BASE_FILE" VERSION_ID)"
+
+BASE_PRETTY="$(os_field "$BASE_FILE" PRETTY_NAME)"
+BASE_NAME="$(os_field "$BASE_FILE" NAME)"
+
+line="$NAME"
+[[ -n "$VERSION_ID" ]] && line="$line $VERSION_ID"
+
+# Só mostra a base quando ela é de fato diferente do sistema (é o caso quando o
+# branding trocou o nome). Num sistema sem marca, não repete a mesma coisa.
+if [[ -n "$BASE_PRETTY" && "$BASE_PRETTY" != "$line" && "$NAME" != "$BASE_NAME" ]]; then
+  line="$line (base $BASE_PRETTY)"
+fi
+
+printf '%s' "$line"
