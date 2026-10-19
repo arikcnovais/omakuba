@@ -29,21 +29,32 @@ xml_escape() {
   printf '%s' "$1" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g'
 }
 
+# Transforma um caminho em URI de arquivo. O python3 cuida dos espaços e dos
+# acentos, que aparecem nos nomes dos wallpapers.
+file_uri() {
+  if command -v python3 >/dev/null 2>&1; then
+    python3 -c 'import pathlib, sys; print(pathlib.Path(sys.argv[1]).as_uri())' "$1"
+  else
+    printf 'file://%s' "$1"
+  fi
+}
+
 apply_wallpaper() {
   local prop="$1"
   [[ -f "$prop" ]] || return 1
 
-  local target
+  local target uri
   target="$(sed -n 's:.*<filename>\([^<]*\)</filename>.*:\1:p' "$prop" | head -1)"
   [[ -n "$target" && -e "$target" ]] || return 1
+  uri="$(file_uri "$target")"
 
-  gsettings set org.gnome.desktop.background picture-uri      "file://${target}"
-  gsettings set org.gnome.desktop.background picture-uri-dark "file://${target}"
+  gsettings set org.gnome.desktop.background picture-uri      "$uri"
+  gsettings set org.gnome.desktop.background picture-uri-dark "$uri"
   gs org.gnome.desktop.background picture-options "zoom"
   gs org.gnome.desktop.background primary-color   "$BREATH_BG"
   gs org.gnome.desktop.background secondary-color "$BREATH_BG"
-  gsettings set org.gnome.desktop.screensaver picture-uri      "file://${target}" 2>/dev/null || true
-  gsettings set org.gnome.desktop.screensaver picture-uri-dark "file://${target}" 2>/dev/null || true
+  gsettings set org.gnome.desktop.screensaver picture-uri      "$uri" 2>/dev/null || true
+  gsettings set org.gnome.desktop.screensaver picture-uri-dark "$uri" 2>/dev/null || true
   ok "papel de parede aplicado: $(wallpaper_name "$(basename "$target")")"
   return 0
 }

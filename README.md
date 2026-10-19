@@ -54,7 +54,7 @@ gaps e atalhos no estilo i3. No 26.04 o Forge não acompanhou o GNOME 50, então
 essa versão não instala nem configura tiling. O GNOME fica com o comportamento
 padrão dele.
 
-O resto é igual nas duas: Yaru, Kitty, Zsh, Starship, workspaces fixos, o atalho
+O resto é igual nas duas: Adwaita, Kitty, Zsh, Starship, workspaces fixos, o atalho
 do Kitty e os ajustes de aparência.
 
 O 26.04 troca o GNOME Terminal pelo Ptyxis. O script ajusta a fonte, o cursor e
@@ -85,7 +85,7 @@ explicado na página de instalação do .NET no Ubuntu.
 | Camada | Resultado |
 |---|---|
 | Janelas | no 24.04, Forge com tiling em árvore e gaps de 8px; no 26.04, o tiling padrão do GNOME |
-| Desktop | Yaru dark preservado, dock enxuto com auto-hide, sem cantos quentes |
+| Desktop | Adwaita dark puro, dock enxuto com auto-hide, sem cantos quentes |
 | Profundidade | Blur my Shell na barra, no dock e na visão geral |
 | Métricas | Vitals com CPU, memória, disco e rede na barra |
 | Energia | Caffeine para o notebook não dormir durante builds longos |
@@ -184,4 +184,4 @@ guardado antes em `~/.omakuba-backup-<data>/`.
 - Os wallpapers são seus, colocados em `dotfiles/backgrounds/`.
 - A paleta Breath vem do Manjaro
   ([Manjaro Artwork, Breath](https://gitlab.manjaro.org/artwork/themes/breath)).
-- O Yaru é o tema do Ubuntu e continua intacto.
+- O Adwaita é o tema padrão do GNOME, sem customização.

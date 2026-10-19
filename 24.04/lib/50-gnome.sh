@@ -1,5 +1,5 @@
 # 50-gnome
-# Deixo o GNOME com cara de i3, mas sem sair do Yaru.
+# Deixo o GNOME com cara de i3, mas com o Adwaita puro.
 # Uso Forge para o tiling, Blur my Shell para o fundo, Vitals para as métricas
 # e Caffeine para o notebook não dormir no meio de um build.
 # No Wayland, extensão recém-instalada só carrega depois de sair e entrar de
@@ -51,10 +51,10 @@ for uuid in "$FORGE_UUID" "$BLUR_UUID" "$VITALS_UUID" "$CAFFEINE_UUID"; do
 done
 gnome-extensions disable "tiling-assistant@ubuntu.com" >/dev/null 2>&1 || true
 
-# Visual: Yaru continua, só ajeito alguns detalhes.
-gs org.gnome.desktop.interface gtk-theme    "Yaru-dark"
-gs org.gnome.desktop.interface icon-theme   "Yaru"
-gs org.gnome.desktop.interface cursor-theme "Yaru"
+# Visual: Adwaita puro, só ajeito alguns detalhes.
+gs org.gnome.desktop.interface gtk-theme    "Adwaita-dark"
+gs org.gnome.desktop.interface icon-theme   "Adwaita"
+gs org.gnome.desktop.interface cursor-theme "Adwaita"
 gs org.gnome.desktop.interface color-scheme "prefer-dark"
 gs org.gnome.desktop.interface clock-show-weekday false
 gs org.gnome.desktop.interface clock-show-date false

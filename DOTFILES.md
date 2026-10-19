@@ -22,7 +22,7 @@ Se já existir algo no destino, o original é guardado antes em
 | `~/.config/xdg-terminals.list` | deixa o Kitty como terminal preferido do sistema, com a entrada `kitty.desktop` | `90-dotfiles` |
 | GNOME Terminal | perfil omakuba, com a paleta Breath, a Nerd Font e 8% de transparência. No 26.04 isso só acontece se você tiver instalado o GNOME Terminal por conta própria | `20-terminal` |
 | Ptyxis | fonte, cursor, opacidade e scrollback. Só no 26.04, que é onde ele é o terminal padrão | `20-terminal` |
-| gsettings e dconf | Yaru dark, dock enxuto, 5 workspaces fixos, `Super+Return`, favoritos do dock, relógio curto, desktop sem ícones e o wallpaper padrão | `50-gnome` e `60-wallpapers` |
+| gsettings e dconf | Adwaita dark, dock enxuto, 5 workspaces fixos, `Super+Return`, favoritos do dock, relógio curto, desktop sem ícones e o wallpaper padrão | `50-gnome` e `60-wallpapers` |
 | Extensões do GNOME | no 24.04: Forge, Blur my Shell, Vitals e Caffeine. No 26.04: Blur my Shell, Vitals e Caffeine | `50-gnome` |
 | Extensões do VS Code | C#, C# Dev Kit, ESLint, Prettier, EditorConfig, Docker, YAML e mais algumas | `40-vscode` |
 

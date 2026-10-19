@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# omakuba para Ubuntu 26.04 (GNOME 50 + Yaru)
+# omakuba para Ubuntu 26.04 (GNOME 50 + Adwaita)
 #
 # Uso:
 #   ./install.sh              roda todos os passos
@@ -33,7 +33,7 @@ WANT_UBUNTU="26.04"
 
 banner() {
   printf '\n\033[38;5;214momakuba para Ubuntu 26.04\033[0m\n'
-  printf '\033[2mGNOME 50, Yaru e sem Forge: o tiling do sistema fica como veio\033[0m\n'
+  printf '\033[2mGNOME 50, Adwaita e sem Forge: o tiling do sistema fica como veio\033[0m\n'
 }
 
 usage() {
@@ -46,7 +46,7 @@ usage() {
     20-terminal    Kitty, Zsh, Starship, plugins do Zsh e um ajuste no Ptyxis
     30-dev         Node LTS, pnpm, yarn, .NET 10 e ferramentas do dotnet
     40-vscode      extensões e settings do VS Code
-    50-gnome       Blur my Shell, Vitals, Caffeine e ajustes do Yaru
+    50-gnome       Blur my Shell, Vitals, Caffeine e ajustes de aparência
     60-wallpapers  instala os wallpapers que estão em dotfiles/backgrounds
     90-dotfiles    copia os dotfiles, com backup do que já existe
 

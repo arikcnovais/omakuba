@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# omakuba para Ubuntu 24.04 (GNOME 46 + Yaru)
+# omakuba para Ubuntu 24.04 (GNOME 46 + Adwaita)
 #
 # Uso:
 #   ./install.sh              roda todos os passos
@@ -33,7 +33,7 @@ WANT_UBUNTU="24.04"
 
 banner() {
   printf '\n\033[38;5;214momakuba para Ubuntu 24.04\033[0m\n'
-  printf '\033[2mGNOME 46, Yaru e Forge no lugar do tiling do sistema\033[0m\n'
+  printf '\033[2mGNOME 46, Adwaita e Forge no lugar do tiling do sistema\033[0m\n'
 }
 
 usage() {
@@ -46,7 +46,7 @@ usage() {
     20-terminal    Kitty, Zsh, Starship e os plugins do Zsh
     30-dev         Node LTS, pnpm, yarn, .NET e ferramentas do dotnet
     40-vscode      extensões e settings do VS Code
-    50-gnome       Forge, Blur my Shell, Vitals, Caffeine e ajustes do Yaru
+    50-gnome       Forge, Blur my Shell, Vitals, Caffeine e ajustes de aparência
     60-wallpapers  instala os wallpapers que estão em dotfiles/backgrounds
     90-dotfiles    copia os dotfiles, com backup do que já existe
 

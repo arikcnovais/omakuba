@@ -52,10 +52,10 @@ done
 # Forge de uma instalação anterior: desligo para não ficar tiling pela metade.
 gnome-extensions disable "$FORGE_UUID" >/dev/null 2>&1 || true
 
-# Visual: Yaru continua, só ajeito alguns detalhes.
-gs org.gnome.desktop.interface gtk-theme    "Yaru-dark"
-gs org.gnome.desktop.interface icon-theme   "Yaru"
-gs org.gnome.desktop.interface cursor-theme "Yaru"
+# Visual: Adwaita puro, só ajeito alguns detalhes.
+gs org.gnome.desktop.interface gtk-theme    "Adwaita-dark"
+gs org.gnome.desktop.interface icon-theme   "Adwaita"
+gs org.gnome.desktop.interface cursor-theme "Adwaita"
 gs org.gnome.desktop.interface color-scheme "prefer-dark"
 gs org.gnome.desktop.interface clock-show-weekday false
 gs org.gnome.desktop.interface clock-show-date false
