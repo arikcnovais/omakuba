@@ -98,7 +98,7 @@ ext_gs() { # uuid schema chave valor
 # Forge — i3 de verdade: gaps de 8px, borda de foco discreta.
 ext_gs "$FORGE_UUID" org.gnome.shell.extensions.forge window-gap-size 8
 ext_gs "$FORGE_UUID" org.gnome.shell.extensions.forge focus-border-size 2
-ext_gs "$FORGE_UUID" org.gnome.shell.extensions.forge focus-border-color "'rgba(131, 163, 152, 0.9)'"
+ext_gs "$FORGE_UUID" org.gnome.shell.extensions.forge focus-border-color "'rgba(26, 188, 156, 0.9)'"   # teal do Breath
 ext_gs "$FORGE_UUID" org.gnome.shell.extensions.forge split-border-toggle false
 ext_gs "$FORGE_UUID" org.gnome.shell.extensions.forge primary-layout-mode "'tiling'"
 ok "Forge: tiling com gaps 8px e borda de foco sutil"

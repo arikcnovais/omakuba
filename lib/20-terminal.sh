@@ -44,18 +44,24 @@ if command -v gnome-terminal >/dev/null; then
     gs "$GT" use-theme-transparency false
     gs "$GT" use-transparent-background true
     gs "$GT" background-transparency-percent 8
-    gs "$GT" foreground-color "#EBDBB2"
-    gs "$GT" background-color "#1D2021"
+    gs "$GT" foreground-color "#17A88B"
+    gs "$GT" background-color "#1E2229"
     gs "$GT" cursor-shape "ibeam"
     gs "$GT" cursor-blink-mode "on"
+    gs "$GT" cursor-colors-set true
+    gs "$GT" cursor-foreground-color "#1E2229"
+    gs "$GT" cursor-background-color "#17A88B"
+    gs "$GT" highlight-colors-set true
+    gs "$GT" highlight-foreground-color "#1E2229"
+    gs "$GT" highlight-background-color "#17A88B"
     gs "$GT" bold-is-bright false
     gs "$GT" scrollback-lines 10000
     gs "$GT" palette \
-      "['#282828', '#cc241d', '#98971a', '#d79921', '#458588', '#b16286', '#689d6a', '#a89984', '#928374', '#fb4934', '#b8bb26', '#fabd2f', '#83a598', '#d3869b', '#8ec07c', '#ebdbb2']"
+      "['#1E2229', '#ED1515', '#44853A', '#F67400', '#1D99F3', '#9B59B6', '#1ABC9C', '#FCFCFC', '#7F8C8D', '#C0392B', '#55A649', '#FDBC4B', '#3DAEE9', '#8E44AD', '#16A085', '#FFFFFF']"
     if grep -qi "JetBrainsMono Nerd Font Mono" < <(fc-list 2>/dev/null); then
       gs "$GT" use-system-font false
       gs "$GT" font "JetBrainsMono Nerd Font Mono 12"
     fi
-    ok "GNOME Terminal: perfil 'omakuba' (Gruvbox + Nerd Font + 8% transparência)"
+    ok "GNOME Terminal: perfil 'omakuba' (Breath do Manjaro + Nerd Font + 8% transparência)"
   fi
 fi

@@ -17,7 +17,7 @@ command_timeout = 1000
 [git_branch]
 format = " on [$symbol$branch]($style) "
 symbol = " "
-style = "bold orange"
+style = "bold #f67400"
 
 [git_status]
 format = "$conflicts$untracked$modified$staged"
@@ -30,26 +30,26 @@ staged = "+"
 # ── Linguagens ───────────────────────────────────────────────────────────────
 [nodejs]
 symbol = " node "
-style = "bold green"
+style = "bold #44853a"
 format = "[$symbol($version )]($style)"
 
 [dotnet]
 symbol = " dotnet "
-style = "bold purple"
+style = "bold #9b59b6"
 format = "[$symbol($version )]($style)"
 
 [docker_context]
 symbol = "  docker "
-style = "bold blue"
+style = "bold #1d99f3"
 format = "[$symbol]($style)"
 
 # ── Partes ───────────────────────────────────────────────────────────────────
 [directory]
-style = "bold cyan"
+style = "bold #fcfcfc"
 format = "[$path]($style) "
 truncate_to_repo = true
 
 [character]
-success_symbol = "[❯](bold green)"
-error_symbol   = "[❯](bold red)"
-vicmd_symbol   = "[❮](bold yellow)"
+success_symbol = "[❯](bold #1abc9c)"
+error_symbol   = "[❯](bold #ed1515)"
+vicmd_symbol   = "[❮](bold #fdbc4b)"

@@ -23,7 +23,7 @@ tema e deixando tudo minimalista.
 | **Desktop minimal** | Yaru preservado (dark), dock enxuto com auto-hide sobre o wallpaper, sem cantos quentes, favoritos reduzidos |
 | **Profundidade visual** | **Blur my Shell** (barra/dock/visão geral), **Vitals** (CPU/RAM/rede/disco na barra) |
 | **Energia** | **Caffeine**: impede suspensão durante builds/testes longos |
-| **Terminal** | **Kitty** (`Super+Return`) com tema escuro; **GNOME Terminal** com o mesmo visual (perfil “omakuba”); **Zsh** + **Starship** + autosuggestions/highlight; fonte **JetBrainsMono Nerd Font** |
+| **Terminal** | **Kitty** (`Super+Return`) com a paleta **Breath** (Manjaro); **GNOME Terminal** com o mesmo visual (perfil “omakuba”); **Zsh** + **Starship** + autosuggestions/highlight; fonte **JetBrainsMono Nerd Font** |
 | **Node/JS** | **nvm** + Node LTS, `pnpm`, `yarn`, `typescript`, `prettier` |
 | **C#/.NET** | **SDK 10 + 8**, `dotnet-ef`, `csharpier` |
 | **Docker** | usuário no grupo `docker` (builds com `docker compose` sem `sudo`) |
@@ -75,6 +75,15 @@ O **tiling-assistant** (que já existia na máquina) é **desativado** para não
 concorrer com o Forge. Para reativar:
 `gnome-extensions enable tiling-assistant@ubuntu.com`.
 
+### Cores do terminal: Breath (Manjaro)
+
+Kitty, GNOME Terminal, tmux e o prompt usam a paleta **Breath** — o colorscheme
+oficial do Konsole do Manjaro: fundo `#1e2229`, primeiro plano `#17a88b` e
+destaques em `#1abc9c` / `#f67400` / `#1d99f3`. Os hexadecimais vivem em
+`dotfiles/kitty.conf`, `dotfiles/tmux.conf` e no passo `lib/20-terminal.sh`,
+então trocar de paleta é editar 3 lugares (ou só o `kitty.conf`, se você usa
+apenas o Kitty).
+
 ---
 
 ## Depois de instalar
@@ -105,4 +114,7 @@ Tudo que é gerenciado está versionado aqui em `dotfiles/` e catalogado em
   Omakub — porém **todo código aqui é próprio**, sem copy-paste dos scripts dele.
 - Wallpapers dinâmicos: [Chillsmeit/linux-dynamic-wallpapers](https://github.com/Chillsmeit/linux-dynamic-wallpapers)
   (instalados pelo script oficial do próprio repositório).
+- Paleta **Breath**: colorscheme oficial do Manjaro
+  ([Manjaro Artwork › Breath](https://gitlab.manjaro.org/artwork/themes/breath)),
+  convertido do formato do Konsole para os terminais usados aqui.
 - Yaru é tema do Ubuntu e permanece intacto.
