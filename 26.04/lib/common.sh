@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+#
+# Helpers que todos os passos usam. O install.sh carrega este arquivo antes
+# de rodar qualquer passo.
+#
+
+# Cores e mensagens. Se a saída não for um terminal, tudo vira texto limpo.
+if [[ -t 1 ]]; then
+  C_RESET=$'\033[0m'; C_DIM=$'\033[2m'; C_BOLD=$'\033[1m'
+  C_ORANGE=$'\033[38;5;214m'; C_GREEN=$'\033[38;5;142m'
+  C_BLUE=$'\033[38;5;110m'; C_YELLOW=$'\033[38;5;221m'; C_RED=$'\033[38;5;203m'
+else
+  C_RESET=""; C_DIM=""; C_BOLD=""
+  C_ORANGE=""; C_GREEN=""; C_BLUE=""; C_YELLOW=""; C_RED=""
+fi
+
+step() { printf '%s>%s %s%s%s\n' "$C_ORANGE" "$C_RESET" "$C_BOLD" "$*" "$C_RESET"; }
+info() { printf '  %s.%s %s\n' "$C_BLUE" "$C_RESET" "$*"; }
+ok()   { printf '  %sok%s %s\n' "$C_GREEN" "$C_RESET" "$*"; }
+warn() { printf '  %saviso%s %s\n' "$C_YELLOW" "$C_RESET" "$*" >&2; }
+err()  { printf '  %serro%s %s\n' "$C_RED" "$C_RESET" "$*" >&2; }
+skip() { printf '  %s-%s %s%s%s\n' "$C_DIM" "$C_RESET" "$C_DIM" "$*" "$C_RESET"; }
+die()  { err "$*"; exit 1; }
+
+# gs <schema> <chave> <valor>
+# Só chama o gsettings se a chave existir. Assim o script não quebra quando
+# uma versão do GNOME muda ou remove alguma opção.
+gs() {
+  local schema="$1" key="$2" value="$3"
+  if gsettings list-keys "$schema" 2>/dev/null | grep -qx "$key"; then
+    gsettings set "$schema" "$key" "$value" 2>/dev/null \
+      || warn "gsettings: valor inválido em '$schema' '$key' (ignorei)"
+  else
+    warn "gsettings: '$key' não existe em '$schema' (ignorei)"
+  fi
+}
+
+# apt_install <pacotes...>
+# Instala só o que ainda não está no sistema.
+apt_install() {
+  local missing=()
+  local pkg
+  for pkg in "$@"; do
+    if ! dpkg -s "$pkg" >/dev/null 2>&1; then
+      missing+=("$pkg")
+    fi
+  done
+  if [[ ${#missing[@]} -eq 0 ]]; then
+    skip "já instalado: $*"
+    return 0
+  fi
+  step "apt-get install: ${missing[*]}"
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "${missing[@]}"
+}
+
+# Backup com data. Tudo que o omakuba vai substituir passa por aqui antes.
+BACKUP_DIR="${BACKUP_DIR:-$HOME/.omakuba-backup-$(date +%Y%m%d-%H%M%S)}"
+backup_file() {
+  local file="$1"
+  [[ -e "$file" ]] || return 0
+  local dest="$BACKUP_DIR$file"
+  mkdir -p "$(dirname "$dest")"
+  cp -a "$file" "$dest"
+  skip "backup: $file -> $BACKUP_DIR$file"
+}
+
+# fetch <url> <destino>
+# Download com algumas tentativas e tempo limite.
+fetch() {
+  local url="$1" dest="$2"
+  curl -fsSL --retry 3 --retry-delay 2 --max-time 180 "$url" -o "$dest"
+}
+
+# install_extension <uuid-ou-numero>
+# Baixa a extensão do extensions.gnome.org para a versão do GNOME em uso.
+# Se não houver versão compatível, avisa e segue.
+install_extension() {
+  local target="$1" shell_ver info download
+  shell_ver="$(gnome-shell --version 2>/dev/null | grep -oE '[0-9]+(\.[0-9]+)+' || echo 46)"
+  shell_ver="${shell_ver%%.*}"
+
+  if gnome-extensions list 2>/dev/null | grep -qxF "$target"; then
+    gnome-extensions enable "$target" >/dev/null 2>&1 || true
+    ok "$target já estava instalada"
+    return 0
+  fi
+
+  if [[ "$target" =~ ^[0-9]+$ ]]; then
+    info="https://extensions.gnome.org/extension-info/?pk=${target}&shell_version=${shell_ver}"
+  else
+    info="https://extensions.gnome.org/extension-info/?uuid=${target}&shell_version=${shell_ver}"
+  fi
+
+  local payload
+  if ! payload="$(fetch "$info" /dev/stdout 2>/dev/null)"; then
+    warn "'$target' não tem versão para o GNOME $shell_ver (pulei)"
+    return 0
+  fi
+  download="$(printf '%s' "$payload" | jq -r '.download_url // empty' 2>/dev/null || true)"
+  local uuid
+  uuid="$(printf '%s' "$payload" | jq -r '.uuid // empty' 2>/dev/null || true)"
+  [[ -n "$download" && -n "$uuid" ]] || { warn "'$target': veio sem download_url (pulei)"; return 0; }
+
+  local tmp; tmp="$(mktemp -d)"
+  if fetch "https://extensions.gnome.org${download}" "$tmp/$uuid.zip" \
+     && gnome-extensions install --force "$tmp/$uuid.zip" >/dev/null 2>&1; then
+    gnome-extensions enable "$uuid" >/dev/null 2>&1 || true
+    ok "$uuid instalada"
+  else
+    warn "não consegui instalar '$uuid' (pulei)"
+  fi
+  rm -rf "$tmp"
+}

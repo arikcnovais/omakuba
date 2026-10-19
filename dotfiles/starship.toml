@@ -1,5 +1,5 @@
-# ~/.config/starship.toml — omakuba
-# Prompt minimalista: pasta → branch → status → linguagem (Node/.NET).
+# ~/.config/starship.toml do omakuba
+# Prompt curto: pasta, branch, status, Node ou .NET.
 
 format = """
 $directory\
@@ -13,7 +13,7 @@ $character"""
 add_newline = false
 command_timeout = 1000
 
-# ── Git ──────────────────────────────────────────────────────────────────────
+# Git
 [git_branch]
 format = " on [$symbol$branch]($style) "
 symbol = " "
@@ -27,7 +27,7 @@ untracked = "? "
 modified = "!"
 staged = "+"
 
-# ── Linguagens ───────────────────────────────────────────────────────────────
+# Linguagens
 [nodejs]
 symbol = " node "
 style = "bold #44853a"
@@ -43,7 +43,7 @@ symbol = "  docker "
 style = "bold #1d99f3"
 format = "[$symbol]($style)"
 
-# ── Partes ───────────────────────────────────────────────────────────────────
+# Partes
 [directory]
 style = "bold #fcfcfc"
 format = "[$path]($style) "

@@ -1,29 +1,26 @@
-# ─────────────────────────────────────────────────────────────────────────────
-#  ~/.zshrc — omakuba
-#  Terminal focado em desenvolvimento: histórico persistente, plugins leves,
-#  aliases de dev e prompt (starship) com linguagens (Node/.NET).
-# ─────────────────────────────────────────────────────────────────────────────
+# ~/.zshrc do omakuba
+# Terminal com histórico grande, plugins leves, aliases de dev e Starship.
 
-# ── Histórico ────────────────────────────────────────────────────────────────
+# Histórico
 HISTFILE="$HOME/.zsh_history"
 HISTSIZE=50000
 SAVEHIST=50000
 setopt SHARE_HISTORY
-setopt HIST_IGNORE_ALL_DUPS   # não repete comandos iguais
-setopt HIST_IGNORE_SPACE      # comando começando com espaço não entra
+setopt HIST_IGNORE_ALL_DUPS   # não repete comando igual
+setopt HIST_IGNORE_SPACE      # comando que começa com espaço não entra
 setopt HIST_REDUCE_BLANKS
 setopt INC_APPEND_HISTORY     # histórico compartilhado entre shells
 
-# ── Comportamento ────────────────────────────────────────────────────────────
-setopt AUTO_CD                 # cd pasta/ sem digitar "cd"
-setopt AUTO_PUSHD              # diretórios visitados viram pilha
+# Comportamento
+setopt AUTO_CD                 # cd pasta/ sem digitar cd
+setopt AUTO_PUSHD              # pastas visitadas viram pilha
 setopt PUSHD_IGNORE_DUPS
 setopt INTERACTIVE_COMMENTS
 setopt NO_BEEP
-setopt NO_FLOW_CONTROL         # Ctrl+S livre no terminal
+setopt NO_FLOW_CONTROL         # libera Ctrl+S no terminal
 setopt COMPLETE_IN_WORD
 
-# ── Completion ───────────────────────────────────────────────────────────────
+# Completion
 autoload -Uz compinit
 compinit
 zstyle ':completion:*' menu select
@@ -32,15 +29,14 @@ zstyle ':completion:*' group-name ''
 zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
-# ── Cores do ls ──────────────────────────────────────────────────────────────
+# Cores do ls
 if command -v dircolors >/dev/null; then
   eval "$(dircolors -b)"
 fi
 
-# ── Teclas ───────────────────────────────────────────────────────────────────
 setopt HIST_FIND_NO_DUPS
 
-# ── Caminhos ─────────────────────────────────────────────────────────────────
+# Caminhos
 typeset -U path PATH
 path=(
   "$HOME/.local/bin"
@@ -50,25 +46,25 @@ path=(
 )
 export PATH
 
-# nvm (Node)
+# nvm
 export NVM_DIR="$HOME/.nvm"
 [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
 
-# ── Editor ───────────────────────────────────────────────────────────────────
+# Editor
 export EDITOR="vim"
 export VISUAL="$EDITOR"
 export PAGER="less -R"
 export LESSHISTFILE=-
 export LESS="-X -F"
 
-# ── Aliases ──────────────────────────────────────────────────────────────────
+# Aliases
 alias ls="ls --color=auto --group-directories-first"
 alias ll="ls -alh --color=auto"
 alias la="ls -A --color=auto"
 alias ..="cd .."
 alias ...="cd ../.."
 
-# Ubuntu suffixa alguns binários (bat, fd)
+# No Ubuntu alguns binários têm outro nome
 alias bat="batcat"
 alias fd="fdfind"
 
@@ -90,7 +86,7 @@ alias dps="docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'"
 alias dpa="docker ps -a"
 alias k9s="kubectl get pods -A"  # só faz sentido se tiver k8s
 
-# ── Plugins ──────────────────────────────────────────────────────────────────
+# Plugins
 ZSH_PLUGIN_DIR="$HOME/.local/share/zsh/plugins"
 if [[ -f "$ZSH_PLUGIN_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
   ZSH_AUTOSUGGEST_STRATEGY=(history completion)
@@ -98,7 +94,7 @@ if [[ -f "$ZSH_PLUGIN_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
   source "$ZSH_PLUGIN_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh"
 fi
 
-# Busca no histórico pelas setas ↑/↓ (histórico "vivo").
+# Setas para cima e para baixo buscam no histórico.
 if [[ -o interactive && -t 0 ]] && [[ -f "$ZSH_PLUGIN_DIR/zsh-history-substring-search/zsh-history-substring-search.zsh" ]]; then
   zmodload zsh/zle
   source "$ZSH_PLUGIN_DIR/zsh-history-substring-search/zsh-history-substring-search.zsh"
@@ -106,7 +102,7 @@ if [[ -o interactive && -t 0 ]] && [[ -f "$ZSH_PLUGIN_DIR/zsh-history-substring-
   bindkey '^[[B' history-substring-search-down
 fi
 
-# ── Prompt (starship) ────────────────────────────────────────────────────────
+# Prompt
 if command -v starship >/dev/null; then
   eval "$(starship init zsh)"
 fi
@@ -117,10 +113,10 @@ fi
 [[ -f /usr/share/doc/fzf/examples/completion.zsh ]] \
   && source /usr/share/doc/fzf/examples/completion.zsh
 
-# syntax highlighting por último
+# Syntax highlighting fica por último.
 if [[ -f "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
   source "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 fi
 
-# ── Sobrescritas locais (opcional) ───────────────────────────────────────────
+# Coisas só suas, se você quiser.
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

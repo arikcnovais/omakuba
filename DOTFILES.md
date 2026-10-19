@@ -1,39 +1,45 @@
-# Catálogo de dotfiles — omakuba
+# Dotfiles
 
-Todos os dotfiles ficam versionados na pasta `dotfiles/` deste projeto e são
-instalados pelo passo `90-dotfiles` do `./install.sh` (com backup automático em
-`~/.omakuba-backup-<data>/` quando já existe um arquivo seu no destino).
+Os arquivos ficam em `dotfiles/`, na raiz do projeto, e são compartilhados pelas
+duas versões do omakuba. O passo `90-dotfiles` copia cada um para o lugar certo.
+Se já existir algo no destino, o original é guardado antes em
+`~/.omakuba-backup-<data>/`.
 
-| # | Origem (projeto) | Destino (sua máquina) | Finalidade |
-|---|---|---|---|
-| 1 | `dotfiles/zshrc` | `~/.zshrc` | Shell padrão: histórico de 50k linhas compartilhado, completion com menu, plugins (autosuggestions, syntax highlighting, busca por histórico), `PATH` com nvm/`~/.dotnet/tools`, aliases de dev/git/docker, prompt starship, atalhos fzf. Sobrescritas locais em `~/.zshrc.local`. |
-| 2 | `dotfiles/kitty.conf` | `~/.config/kitty/kitty.conf` | Terminal padrão (`Super+Return`): JetBrainsMono Nerd Font 12, paleta **Breath** (Manjaro), scrollback 10k, tabs powerline discretas, atalhos de abas/janelas. |
-| 3 | `dotfiles/starship.toml` | `~/.config/starship.toml` | Prompt minimalista: pasta → branch git → status → **Node** → **.NET** → seta. |
-| 4 | `dotfiles/vimrc` | `~/.vimrc` | Vim de emergência/terminal: numeração, cursorline, busca inteligente, undo persistente, clipboard do sistema, paleta sóbria (habamax). |
-| 5 | `dotfiles/tmux.conf` | `~/.tmux.conf` | Sessões que sobrevivem a queda de conexão: mouse, histórico 50k, índices a partir de 1, divisões com `|` e `-`, barra discreta. |
-| 6 | `dotfiles/vscode-settings.json` | `~/.config/Code/User/settings.json` | Settings minimalistas de dev (web + C#): fonte Nerd com ligatures, format on save, minimap off, rulers 80/120, terminal integrado em zsh, telemetry off. **Merge preservando suas escolhas** (tema/ícones nunca são sobrescritos). |
-| 7 | `dotfiles/backgrounds/Bamboo_wallpaper.png` | `/usr/share/backgrounds/omakuba/Bamboo_wallpaper.png` | **Wallpaper padrão do omakuba** (Bamboo, 5K). O descriptor `/usr/share/gnome-background-properties/omakuba-bamboo.xml` faz ele **aparecer em Configurações › Aparência › Fundo de tela** como “Bamboo (omakuba)”. |
+| Arquivo | Vai para | Para que serve |
+|---|---|---|
+| `zshrc` | `~/.zshrc` | histórico de 50 mil linhas, completion com menu, plugins, PATH com nvm e `~/.dotnet/tools`, aliases de dev e o prompt do Starship. Coisas só suas cabem em `~/.zshrc.local`. |
+| `kitty.conf` | `~/.config/kitty/kitty.conf` | terminal padrão do setup, com a fonte Nerd, a paleta Breath, scrollback de 10 mil linhas e atalhos de abas. |
+| `starship.toml` | `~/.config/starship.toml` | prompt curto: pasta, branch, status, Node ou .NET. |
+| `vimrc` | `~/.vimrc` | Vim de emergência: numeração, cursorline, busca inteligente, undo persistente e clipboard do sistema. |
+| `tmux.conf` | `~/.tmux.conf` | sessões que sobrevivem à queda de conexão, mouse, histórico de 50 mil linhas, índices a partir de 1 e barra discreta. |
+| `vscode-settings.json` | `~/.config/Code/User/settings.json` | settings de web e C#, com format on save, minimap desligado e telemetria off. O passo `40-vscode` faz merge e nunca sobrescreve o que você já escolheu. |
+| `backgrounds/Bamboo_wallpaper.png` | `/usr/share/backgrounds/omakuba/Bamboo_wallpaper.png` | papel de parede padrão do projeto. O XML que o passo `60-wallpapers` cria faz ele aparecer em Configurações, Aparência, Papel de parede. |
 
-## Configurações gerenciadas por script (não são dotfiles)
+## O que o script configura fora dos dotfiles
 
 | Onde | O quê | Passo |
 |---|---|---|
-| `~/.config/xdg-terminals.list` | Define o **kitty** como terminal preferido do sistema | `90-dotfiles` |
-| GNOME Terminal (dconf) | Perfil **omakuba**: paleta **Breath** (Manjaro), Nerd Font 12, 8% de transparência, cursor `ibeam`, scrollback 10k — mesmo visual do kitty | `20-terminal` |
-| dconf/gsettings (org.gnome.*) | Yaru preservado (dark), dock clássico refinado (altura total, DOTS, 72% opacidade dinâmica, auto-hide), Blur my Shell, Vitals, 5 workspaces fixos, teclas `Super+1..5`, `Super+Return` → kitty, favoritos do dock, relógio mínimo, desktop sem ícones, wallpaper **Bamboo** como padrão (claro/escuro/tela de bloqueio) | `50-gnome` / `60-wallpapers` |
-| Extensões do GNOME | Forge, Blur my Shell, Vitals, Caffeine (instaladas em `~/.local/share/gnome-shell/extensions`) | `50-gnome` |
-| Extensões do VS Code | C#, C# Dev Kit, ESLint, Prettier, EditorConfig, Docker, YAML, etc. | `40-vscode` |
+| `~/.config/xdg-terminals.list` | deixa o Kitty como terminal preferido do sistema, com a entrada `kitty.desktop` | `90-dotfiles` |
+| GNOME Terminal | perfil omakuba, com a paleta Breath, a Nerd Font e 8% de transparência. No 26.04 isso só acontece se você tiver instalado o GNOME Terminal por conta própria | `20-terminal` |
+| Ptyxis | fonte, cursor, opacidade e scrollback. Só no 26.04, que é onde ele é o terminal padrão | `20-terminal` |
+| gsettings e dconf | Yaru dark, dock enxuto, 5 workspaces fixos, `Super+Return`, favoritos do dock, relógio curto, desktop sem ícones e o wallpaper Bamboo | `50-gnome` e `60-wallpapers` |
+| Extensões do GNOME | no 24.04: Forge, Blur my Shell, Vitals e Caffeine. No 26.04: Blur my Shell, Vitals e Caffeine | `50-gnome` |
+| Extensões do VS Code | C#, C# Dev Kit, ESLint, Prettier, EditorConfig, Docker, YAML e mais algumas | `40-vscode` |
 
-> **Git é intencionalmente NÃO configurado** — identidade (nome/e-mail),
-> branch padrão,Aliases etc. são escolhas pessoais: configure com
-> `git config --global --edit`. O setup só te dá o **lazygit** e o **tmux**.
-
-## Reinstalar / ajustar
+O Git é de propósito não configurado. Nome, e-mail, branch padrão e aliases são
+coisa pessoal. O setup só entrega o lazygit e o tmux. Para configurar:
 
 ```bash
-./install.sh 90-dotfiles          # re-deploya os dotfiles (idempotente)
-vim ~/.zshrc                      # tweak pessoal: use ~/.zshrc.local
+git config --global --edit
 ```
 
-Backups ficam em `~/.omakuba-backup-<data-hora>/` com o caminho original
-preservado — algo que foi sobrescrito pode ser recuperado de lá.
+## Para rodar de novo
+
+```bash
+./install.sh 90-dotfiles     # copia os dotfiles outra vez
+./24.04/install.sh 90-dotfiles
+./26.04/install.sh 90-dotfiles
+```
+
+Os backups ficam em `~/.omakuba-backup-<data-hora>/`, com o caminho original
+preservado dentro. Se algo foi trocado e você quer de volta, é só olhar lá.

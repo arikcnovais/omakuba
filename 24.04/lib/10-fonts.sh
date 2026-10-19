@@ -1,6 +1,5 @@
-# ── 10-fonts ────────────────────────────────────────────────────────────────
-# JetBrainsMono Nerd Font: uma fonte só para código/terminal, com ícones
-# (glifos Nerd Font) para o starship e para o terminal.
+# 10-fonts
+# JetBrainsMono Nerd Font. Uso no terminal, no VS Code e no GNOME.
 FONT_ROOT="$HOME/.local/share/fonts"
 if fc-list 2>/dev/null | grep -qi "JetBrainsMono Nerd Font Mono"; then
   skip "JetBrainsMono Nerd Font já instalada"
@@ -10,9 +9,9 @@ else
     mkdir -p "$FONT_ROOT/JetBrainsMono"
     unzip -oq "$tmp/jbm.zip" -d "$FONT_ROOT/JetBrainsMono"
     fc-cache -f >/dev/null 2>&1
-    ok "JetBrainsMono Nerd Font instalada em ~/.local/share/fonts"
+    ok "fonte instalada em ~/.local/share/fonts"
   else
-    warn "download da Nerd Font falhou (ignorado)"
+    warn "o download da fonte falhou (pulei)"
   fi
   rm -rf "$tmp"
 fi

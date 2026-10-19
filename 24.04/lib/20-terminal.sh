@@ -1,40 +1,42 @@
-# ── 20-terminal ─────────────────────────────────────────────────────────────
-# Terminal estilo i3: Kitty + Zsh + Starship + dois plugins leves.
+# 20-terminal
+# Kitty, Zsh, Starship e os plugins do Zsh.
 apt_install kitty zsh
 
-# Starship (prompt) — instalador oficial.
+# Starship pelo instalador oficial.
 if command -v starship >/dev/null; then
   skip "starship já instalado"
 else
   if curl -fsSL --max-time 60 https://starship.rs/install.sh | sudo sh -s -- -y -b /usr/local/bin >/dev/null 2>&1; then
     ok "starship instalado"
   else
-    warn "starship não pôde ser instalado (ignorado)"
+    warn "não consegui instalar o starship (pulei)"
   fi
 fi
 
-# Plugins de zsh (autosuggestions + syntax highlighting) em ~/.local/share.
+# Plugins do Zsh ficam em ~/.local/share para não sujar o home.
 ZSH_PLUGIN_DIR="$HOME/.local/share/zsh/plugins"
 mkdir -p "$ZSH_PLUGIN_DIR"
 for repo in zsh-users/zsh-autosuggestions zsh-users/zsh-syntax-highlighting zsh-users/zsh-history-substring-search; do
   name="${repo##*/}"
   if [[ -d "$ZSH_PLUGIN_DIR/$name" ]]; then
-    skip "$name já clonado"
+    skip "$name já está clonado"
   else
     git clone --depth=1 "https://github.com/$repo.git" "$ZSH_PLUGIN_DIR/$name" >/dev/null 2>&1 \
-      && ok "$name clonado" || warn "$name falhou (ignorado)"
+      && ok "$name clonado" \
+      || warn "$name falhou (pulei)"
   fi
 done
 
-# Zsh como shell padrão do usuário (abre novo login já no lugar).
+# Zsh como shell padrão. Vale no próximo login.
 current_shell="$(getent passwd "$USER" | cut -d: -f7)"
 if [[ "$current_shell" != "$(command -v zsh)" ]]; then
-  sudo chsh -s "$(command -v zsh)" "$USER" && ok "shell padrão -> zsh (vale no próximo login)"
+  sudo chsh -s "$(command -v zsh)" "$USER" \
+    && ok "shell padrão agora é o zsh (vale no próximo login)"
 else
-  skip "zsh já é o shell padrão"
+  skip "o zsh já é o seu shell padrão"
 fi
 
-# GNOME Terminal — mesmo visual do kitty (para quando você abrir ele).
+# Deixo o GNOME Terminal com a mesma cara do Kitty, para quando ele aparecer.
 if command -v gnome-terminal >/dev/null; then
   GT_PROFILE="$(gsettings get org.gnome.Terminal.ProfilesList default 2>/dev/null | tr -d "'" || true)"
   if [[ -n "$GT_PROFILE" ]]; then
@@ -62,6 +64,6 @@ if command -v gnome-terminal >/dev/null; then
       gs "$GT" use-system-font false
       gs "$GT" font "JetBrainsMono Nerd Font Mono 12"
     fi
-    ok "GNOME Terminal: perfil 'omakuba' (Breath do Manjaro + Nerd Font + 8% transparência)"
+    ok "GNOME Terminal com o perfil omakuba"
   fi
 fi

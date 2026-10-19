@@ -1,100 +1,39 @@
 #!/usr/bin/env bash
 #
-#  omakuba — setup de desenvolvimento para Ubuntu 24.04 (GNOME/Yaru)
-#  Inspirado na filosofia do Omakub, escrito do zero (zero componentes do Omakub).
-#
-#  Uso:
-#     ./install.sh              # executa todos os passos
-#     ./install.sh --list       # lista os passos
-#     ./install.sh 30-dev       # executa apenas o passo 30-dev
-#     ./install.sh 50-gnome 90-dotfiles
+# Atalho para não precisar lembrar qual pasta usar.
+# Ele olha a versão do Ubuntu e chama o install.sh certo.
 #
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=lib/common.sh
-source "$ROOT/lib/common.sh"
 
-ALL_STEPS=(
-  "00-base"
-  "10-fonts"
-  "20-terminal"
-  "30-dev"
-  "40-vscode"
-  "50-gnome"
-  "60-wallpapers"
-  "90-dotfiles"
-)
-
-banner() {
-  printf '\n\033[38;5;214m%s\033[0m\n' "  ╔══════════════════════════════════════════════════╗"
-  printf '\033[38;5;214m%s\033[0m\n' "  ║  omakuba · dev setup para Ubuntu 24.04 + GNOME     ║"
-  printf '\033[38;5;214m%s\033[0m\n' "  ╚══════════════════════════════════════════════════╝"
-}
-
-usage() {
-  banner
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
   cat <<'EOF'
+omakuba
 
-  Passos disponíveis:
-    00-base        Ferramentas base via APT + usuário no grupo docker
-    10-fonts       JetBrainsMono Nerd Font (ícones no terminal/editor)
-    20-terminal    Kitty + Zsh + Starship + plugins (autosuggestions/highlight)
-    30-dev         Node LTS via nvm, pnpm/yarn, .NET SDK 10 + 8, dotnet tools
-    40-vscode      Extensões do VS Code + settings minimalistas (merge)
-    50-gnome       Extensões (Forge, Blur my Shell, Vitals, Caffeine) + Yaru polish
-    60-wallpapers  Wallpapers dinâmicos (Chillsmeit) + aplicar um dark minimal
-    90-dotfiles    Deploy dos dotfiles (com backup do que já existe)
+  ./install.sh              escolhe o script pela versão do Ubuntu
+  ./install.sh --list       mostra os passos da versão atual
+  ./install.sh 50-gnome     roda só um passo
 
-  Uso:
-    ./install.sh              # tudo
-    ./install.sh --list       # só a lista
-    ./install.sh 50-gnome     # um passo específico
-
+Também dá para chamar direto:
+  ./24.04/install.sh
+  ./26.04/install.sh
 EOF
-}
+  exit 0
+fi
 
-require_sudo() {
-  if sudo -n true 2>/dev/null; then
-    return 0
-  fi
-  if [[ -t 0 ]]; then
-    step "Validando credenciais sudo…"
-    sudo -v || die "sudo falhou."
-  else
-    die "Sem credenciais sudo. Rode 'sudo -v' antes (ou em um terminal interativo)."
-  fi
-}
+VERSION_ID=""
+if [[ -r /etc/os-release ]]; then
+  VERSION_ID="$(. /etc/os-release; printf '%s' "${VERSION_ID:-}")"
+fi
 
-main() {
-  if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then usage; exit 0; fi
-  if [[ "${1:-}" == "--list" ]]; then printf '%s\n' "${ALL_STEPS[@]}"; exit 0; fi
-
-  local steps=()
-  if [[ $# -gt 0 ]]; then
-    steps=("$@")
-  else
-    steps=("${ALL_STEPS[@]}")
-  fi
-
-  require_sudo
-  banner
-
-  local started total=0
-  started=$(date +%s)
-
-  for step_name in "${steps[@]}"; do
-    local file="$ROOT/lib/${step_name}.sh"
-    [[ -f "$file" ]] || die "Passo desconhecido: '$step_name' (use --list)"
-    total=$((total + 1))
-    printf '\n\033[1;38;5;208m▸ %s\033[0m\n' "$((total)). $step_name"
-    # shellcheck disable=SC1090
-    source "$file"
-  done
-
-  local elapsed=$(( $(date +%s) - started ))
-  printf '\n'
-  ok "Concluído em ${elapsed}s — aproveite seu setup."
-}
-
-main "$@"
+case "$VERSION_ID" in
+  24.04|26.04)
+    exec "$ROOT/$VERSION_ID/install.sh" "$@"
+    ;;
+  *)
+    printf 'Não reconheci a versão do Ubuntu (%s).\n' "${VERSION_ID:-desconhecida}" >&2
+    printf 'Escolha na mão: ./24.04/install.sh ou ./26.04/install.sh\n' >&2
+    exit 1
+    ;;
+esac
