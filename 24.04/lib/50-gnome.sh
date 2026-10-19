@@ -82,6 +82,17 @@ gs org.gnome.desktop.peripherals.keyboard numlock-state true
 gs org.gnome.mutter center-new-windows true
 gs org.gnome.desktop.sound allow-volume-above-100-percent false
 
+# Polimento do dia a dia: detalhes pequenos que deixam o desktop mais
+# confortável, sem sair do Adwaita.
+gs org.gnome.desktop.interface show-battery-percentage true
+gs org.gnome.desktop.interface font-antialiasing "'rgba'"
+gs org.gnome.desktop.interface font-hinting "'slight'"
+gs org.gnome.desktop.calendar show-weekdate true
+gs org.gnome.desktop.peripherals.touchpad tap-to-click true
+gs org.gnome.desktop.wm.preferences action-middle-click-titlebar "'minimize'"
+gs org.gnome.mutter check-alive-timeout 20000
+ok "polimento: bateria, fontes, touchpad e janelas"
+
 # Desktop limpo, só com o papel de parede.
 gs org.gnome.shell.extensions.ding show-home false
 gs org.gnome.shell.extensions.ding show-trash false
@@ -103,7 +114,7 @@ if [[ "$DOCK_DISABLED" -eq 0 ]]; then
   gs $DOCK dock-fixed            false
   gs $DOCK autohide              true
   gs $DOCK intellihide           true
-  gs $DOCK show-trash            false
+  gs $DOCK show-trash            true
   gs $DOCK show-mounts           false
   gs $DOCK show-mounts-network   false
   gs $DOCK dash-max-icon-size    40

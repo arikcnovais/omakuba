@@ -1,9 +1,10 @@
 # 65-bluefin-wallpapers
 # Baixa os wallpapers do Bluefin e da Universal Blue direto do repositório
 # ublue-os/artwork. Eles entram na mesma pasta do omakuba e aparecem em
-# Configurações > Aparência > Papel de parede. O padrão continua sendo o
-# green forest, que o passo 60 aplica.
+# Configurações > Aparência > Papel de parede. No fim, o Sunrise da Universal
+# Blue vira o padrão; o green forest fica de reserva no passo 60.
 
+WP_SRC_DIR="${WP_SRC_DIR:-$DOTFILES_DIR/backgrounds}"
 WP_DST_DIR="${WP_DST_DIR:-/usr/share/backgrounds/omakuba}"
 WP_XML_DIR="${WP_XML_DIR:-/usr/share/gnome-background-properties}"
 WP_CACHE_DIR="${WP_CACHE_DIR:-$HOME/.cache/omakuba/wallpapers}"
@@ -131,6 +132,30 @@ ublue_single "eyes"      "eyes"      "eyes.svg"      "Eyes"
 ublue_single "huntress"  "huntress"  "huntress.jxl"  "Huntress"
 ublue_single "lazy-days" "lazy-days" "lazy-days.jxl" "Lazy Days"
 
+sunrise_xml="$WP_XML_DIR/omakuba-ublue-sunrise.xml"
+
+if [[ -n "${OMAKUBA_WALLPAPER:-}" ]]; then
+  wp_override="$OMAKUBA_WALLPAPER"
+  [[ -f "$wp_override" ]] || wp_override="$WP_DST_DIR/$OMAKUBA_WALLPAPER"
+  [[ -f "$wp_override" ]] || wp_override="$WP_SRC_DIR/$OMAKUBA_WALLPAPER"
+  [[ -f "$wp_override" ]] || wp_override="$WP_XML_DIR/$OMAKUBA_WALLPAPER"
+
+  if [[ "$wp_override" == *.xml ]]; then
+    wallpaper_apply_xml "$wp_override" \
+      || warn "não consegui aplicar OMAKUBA_WALLPAPER=$OMAKUBA_WALLPAPER"
+  elif [[ -f "$wp_override" ]]; then
+    wallpaper_apply_image "$wp_override" \
+      || warn "não consegui aplicar OMAKUBA_WALLPAPER=$OMAKUBA_WALLPAPER"
+  else
+    warn "OMAKUBA_WALLPAPER não existe: $OMAKUBA_WALLPAPER"
+  fi
+elif [[ -f "$sunrise_xml" ]]; then
+  wallpaper_apply_xml "$sunrise_xml" \
+    && ok "padrão aplicado: Universal Blue: Sunrise" \
+    || warn "não consegui aplicar o Sunrise"
+fi
+
 info "os wallpapers do Bluefin e da Universal Blue ficam em $WP_DST_DIR."
-info "o padrão continua sendo o green forest, aplicado no passo 60-wallpapers."
+info "o padrão é o Sunrise da Universal Blue; o green forest fica de reserva."
+info "para escolher outro: OMAKUBA_WALLPAPER=... ./install.sh 60-wallpapers"
 info "o cache dos downloads fica em $WP_CACHE_DIR."

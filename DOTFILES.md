@@ -13,8 +13,8 @@ Se já existir algo no destino, o original é guardado antes em
 | `vimrc` | `~/.vimrc` | Vim de emergência: numeração, cursorline, busca inteligente, undo persistente e clipboard do sistema. |
 | `tmux.conf` | `~/.tmux.conf` | sessões que sobrevivem à queda de conexão, mouse, histórico de 50 mil linhas, índices a partir de 1 e barra discreta. |
 | `vscode-settings.json` | `~/.config/Code/User/settings.json` | settings de web e C#, com format on save, minimap desligado e telemetria off. O passo `40-vscode` faz merge e nunca sobrescreve o que você já escolheu. |
-| `backgrounds/` | `/usr/share/backgrounds/omakuba/` | seus wallpapers. O passo `60-wallpapers` instala todas as imagens da pasta e cria o XML que faz cada uma aparecer em Configurações, Aparência, Papel de parede. O `green forest.jpg`, se estiver na pasta, vira o padrão; depois dele, o Bamboo; depois, a primeira imagem. Os wallpapers do Bluefin e da Universal Blue entram à parte, no passo `65-bluefin-wallpapers`. |
-| `bin/omakuba` | `~/.local/bin/omakuba` | o comando do dia a dia: `update`, `dock on/off/status` e `doctor`. Quem instala é o passo `85-updates`. |
+| `backgrounds/` | `/usr/share/backgrounds/omakuba/` | seus wallpapers. O passo `60-wallpapers` instala todas as imagens da pasta e cria o XML que faz cada uma aparecer em Configurações, Aparência, Papel de parede. O padrão é o Sunrise da Universal Blue, que entra no `65-bluefin-wallpapers`; o `green forest.jpg` fica de reserva. Para escolher outro, use `OMAKUBA_WALLPAPER=/caminho/da/imagem`. |
+| `bin/omakuba` | `~/.local/bin/omakuba` | o comando do dia a dia: `update`, `dock on/off/status`, `store` e `doctor`. Quem instala é o passo `85-updates`. |
 | `systemd/user/omakuba-update.service` | `~/.config/systemd/user/` | roda o `omakuba update` uma vez por semana, sem sudo, para Flatpak e Homebrew. |
 | `systemd/user/omakuba-update.timer` | `~/.config/systemd/user/` | agenda o serviço acima. O `85-updates` liga o timer com `systemctl --user`. |
 
@@ -29,8 +29,9 @@ O ícone do Ptyxis fica em `dotfiles/icons/` e é a exceção: quem instala é o
 | GNOME Terminal | perfil omakuba, com a paleta Breath, a Nerd Font e 8% de transparência. No 26.04 isso só acontece se você tiver instalado o GNOME Terminal por conta própria | `20-terminal` |
 | Ptyxis | fonte, cursor, opacidade e scrollback. Só no 26.04, que é onde ele é o terminal padrão | `20-terminal` |
 | `/usr/share/icons/hicolor/scalable/apps/org.gnome.Ptyxis.svg` | logo novo do Ptyxis, copiado de `dotfiles/icons/`, e cache do hicolor atualizado. O hicolor é o fallback que o Adwaita usa. Só no 26.04 | `20-terminal` |
-| gsettings e dconf | Adwaita dark, dock do Ubuntu em barra lateral esquerda com blur, 5 workspaces fixos, atalhos do Bluefin, favoritos do dock, relógio com dia da semana, desktop sem ícones e o wallpaper padrão | `50-gnome` e `60-wallpapers` |
+| gsettings e dconf | Adwaita dark, dock do Ubuntu em barra lateral esquerda com blur e lixeira, 5 workspaces fixos, atalhos do Bluefin, favoritos do dock, relógio com dia da semana, desktop sem ícones, polimento de bateria, fontes e touchpad e o wallpaper padrão | `50-gnome`, `60-wallpapers` e `65-bluefin-wallpapers` |
 | Extensões do GNOME | no 24.04: Forge como extra, Blur my Shell, Vitals, Caffeine, GSConnect, Search Light e Logo Menu. No 26.04: o mesmo conjunto sem o Forge. O AppIndicator e o Dash to Dock são os pacotes do Ubuntu (`ubuntu-appindicators` e `ubuntu-dock`) | `50-gnome` |
+| Loja gráfica | o Bazaar é a única loja; o passo `05-store` remove a Snap Store e o `ubuntu-software`, sem tirar o `snapd` nem o comando `snap`. O APT e os `.deb` continuam normais | `05-store` e `70-flatpaks` |
 | Flatpak | Flathub, Bazaar, Flatseal, Extension Manager, Mission Center, Gradia, Pinta, Refine, DistroShelf, Ignition, Impression e os temas adw-gtk3. O conjunto completo do GNOME fica atrás de `OMAKUBA_FULL_FLATPAKS=1` | `70-flatpaks` |
 | CLI | Homebrew em `/home/linuxbrew/.linuxbrew`, com mise, chezmoi, topgrade, dysk e podman-tui; o resto vem do APT | `75-cli` |
 | DX | Podman, Distrobox, virt-manager, Incus, Cockpit e as ferramentas de Kubernetes/CNCF. Só roda com `OMAKUBA_DX=1` | `80-dx` |

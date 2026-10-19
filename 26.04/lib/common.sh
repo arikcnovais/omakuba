@@ -35,6 +35,61 @@ gs() {
   fi
 }
 
+# wallpaper_file_uri <caminho>
+# Converte um caminho em URI de arquivo, cuidando de espaços e acentos.
+wallpaper_file_uri() {
+  if command -v python3 >/dev/null 2>&1; then
+    python3 -c 'import pathlib, sys; print(pathlib.Path(sys.argv[1]).as_uri())' "$1"
+  else
+    printf 'file://%s' "$1"
+  fi
+}
+
+# wallpaper_set_uri <dia> <noite> <rótulo>
+# Aplica o papel de parede no GNOME, incluindo a tela de bloqueio. O par
+# dia/noite é o mesmo que o Bluefin usa nos wallpapers da Universal Blue.
+wallpaper_set_uri() {
+  local day="$1" night="${2:-$1}" label="${3:-papel de parede}"
+  [[ -f "$day" ]] || return 1
+  [[ -f "$night" ]] || night="$day"
+
+  local day_uri night_uri
+  day_uri="$(wallpaper_file_uri "$day")"
+  night_uri="$(wallpaper_file_uri "$night")"
+
+  gsettings set org.gnome.desktop.background picture-uri      "$day_uri"
+  gsettings set org.gnome.desktop.background picture-uri-dark "$night_uri"
+  gs org.gnome.desktop.background picture-options "zoom"
+  gs org.gnome.desktop.background primary-color   "${BREATH_BG:-#1e2229}"
+  gs org.gnome.desktop.background secondary-color "${BREATH_BG:-#1e2229}"
+  gsettings set org.gnome.desktop.screensaver picture-uri      "$day_uri" 2>/dev/null || true
+  gsettings set org.gnome.desktop.screensaver picture-uri-dark "$night_uri" 2>/dev/null || true
+  ok "papel de parede aplicado: $label"
+}
+
+# wallpaper_apply_xml <arquivo.xml>
+# Lê o XML que o GNOME usa em Configurações, Aparência, Papel de parede.
+wallpaper_apply_xml() {
+  local prop="$1"
+  [[ -f "$prop" ]] || return 1
+
+  local day night label
+  day="$(sed -n 's:.*<filename>\([^<]*\)</filename>.*:\1:p' "$prop" | sed -n '1p')"
+  night="$(sed -n 's:.*<filename-dark>\([^<]*\)</filename-dark>.*:\1:p' "$prop" | sed -n '1p')"
+  label="$(sed -n 's:.*<name>\([^<]*\)</name>.*:\1:p' "$prop" | sed -n '1p')"
+
+  [[ -n "$day" && -e "$day" ]] || return 1
+  wallpaper_set_uri "$day" "${night:-$day}" "${label:-$(basename "$day")}"
+}
+
+# wallpaper_apply_image <imagem>
+# Para quando você aponta OMAKUBA_WALLPAPER para uma imagem solta.
+wallpaper_apply_image() {
+  local img="$1"
+  [[ -f "$img" ]] || return 1
+  wallpaper_set_uri "$img" "$img" "$(basename "$img")"
+}
+
 # apt_install <pacotes...>
 # Instala só o que ainda não está no sistema.
 apt_install() {

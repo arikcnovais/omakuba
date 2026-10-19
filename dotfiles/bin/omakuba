@@ -23,6 +23,7 @@ omakuba
   omakuba dock on           liga o dock do Ubuntu
   omakuba dock off          desliga o dock (fica só a visão geral)
   omakuba dock status       mostra se o dock está ligado
+  omakuba store             abre o Bazaar, a loja do omakuba
   omakuba doctor            mostra versões e o estado do ambiente
   omakuba help              esta ajuda
 
@@ -91,6 +92,19 @@ cmd_dock() {
   esac
 }
 
+cmd_store() {
+  if ! command -v flatpak >/dev/null 2>&1; then
+    printf 'o Flatpak ainda não está instalado. Rode: ./install.sh 70-flatpaks\n' >&2
+    return 1
+  fi
+  if ! flatpak info io.github.kolunmi.Bazaar >/dev/null 2>&1; then
+    printf 'o Bazaar ainda não está instalado. Rode: ./install.sh 70-flatpaks\n' >&2
+    return 1
+  fi
+  flatpak run io.github.kolunmi.Bazaar "$@" >/dev/null 2>&1 &
+  printf 'abrindo o Bazaar...\n'
+}
+
 pretty_version() {
   local cmd="$1"
   if command -v "$cmd" >/dev/null 2>&1; then
@@ -108,6 +122,16 @@ cmd_doctor() {
   printf '%-18s %s\n' "Docker" "$(pretty_version docker)"
   printf '%-18s %s\n' "Podman" "$(pretty_version podman)"
   printf '%-18s %s\n' "VS Code" "$(pretty_version code)"
+  if command -v snap >/dev/null 2>&1 && snap list snap-store >/dev/null 2>&1; then
+    printf '%-18s %s\n' "Snap Store" "instalada (rode ./install.sh 05-store)"
+  else
+    printf '%-18s %s\n' "Snap Store" "ausente"
+  fi
+  if command -v flatpak >/dev/null 2>&1 && flatpak info io.github.kolunmi.Bazaar >/dev/null 2>&1; then
+    printf '%-18s %s\n' "Bazaar" "instalado"
+  else
+    printf '%-18s %s\n' "Bazaar" "ausente"
+  fi
   if command -v tailscale >/dev/null 2>&1; then
     printf '%-18s %s\n' "Tailscale" "$(tailscale version 2>/dev/null | sed -n '1p')"
   else
@@ -122,6 +146,7 @@ cmd_doctor() {
 case "${1:-help}" in
   update) shift; cmd_update "$@" ;;
   dock)   shift; cmd_dock "$@" ;;
+  store)  shift; cmd_store "$@" ;;
   doctor) cmd_doctor ;;
   help|-h|--help|"") usage ;;
   *)

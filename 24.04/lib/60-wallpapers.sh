@@ -1,7 +1,8 @@
 # 60-wallpapers
 # Pega as imagens que você deixar em dotfiles/backgrounds/ e instala todas no
 # sistema, criando o XML que faz cada uma aparecer em Configurações, Aparência,
-# Papel de parede. O green forest fica como padrão quando está na pasta.
+# Papel de parede. O padrão é o Sunrise da Universal Blue; o green forest fica
+# de reserva para quando o passo 65 ainda não baixou os wallpapers do Bluefin.
 
 WP_SRC_DIR="${WP_SRC_DIR:-$DOTFILES_DIR/backgrounds}"
 WP_DST_DIR="${WP_DST_DIR:-/usr/share/backgrounds/omakuba}"
@@ -17,6 +18,8 @@ wallpaper_name() {
     printf 'Bamboo (omakuba)'
   elif [[ "$base" == [Gg]reen[[:space:]]*[Ff]orest ]]; then
     printf 'Green Forest (omakuba)'
+  elif [[ "$base" == [Ss]unrise* ]]; then
+    printf 'Sunrise (Universal Blue)'
   else
     printf '%s (omakuba)' "$base"
   fi
@@ -29,36 +32,6 @@ wallpaper_slug() {
 
 xml_escape() {
   printf '%s' "$1" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g'
-}
-
-# Transforma um caminho em URI de arquivo. O python3 cuida dos espaços e dos
-# acentos, que aparecem nos nomes dos wallpapers.
-file_uri() {
-  if command -v python3 >/dev/null 2>&1; then
-    python3 -c 'import pathlib, sys; print(pathlib.Path(sys.argv[1]).as_uri())' "$1"
-  else
-    printf 'file://%s' "$1"
-  fi
-}
-
-apply_wallpaper() {
-  local prop="$1"
-  [[ -f "$prop" ]] || return 1
-
-  local target uri
-  target="$(sed -n 's:.*<filename>\([^<]*\)</filename>.*:\1:p' "$prop" | sed -n '1p')"
-  [[ -n "$target" && -e "$target" ]] || return 1
-  uri="$(file_uri "$target")"
-
-  gsettings set org.gnome.desktop.background picture-uri      "$uri"
-  gsettings set org.gnome.desktop.background picture-uri-dark "$uri"
-  gs org.gnome.desktop.background picture-options "zoom"
-  gs org.gnome.desktop.background primary-color   "$BREATH_BG"
-  gs org.gnome.desktop.background secondary-color "$BREATH_BG"
-  gsettings set org.gnome.desktop.screensaver picture-uri      "$uri" 2>/dev/null || true
-  gsettings set org.gnome.desktop.screensaver picture-uri-dark "$uri" 2>/dev/null || true
-  ok "papel de parede aplicado: $(wallpaper_name "$(basename "$target")")"
-  return 0
 }
 
 green_xml=""
@@ -120,10 +93,33 @@ XML
   fi
 fi
 
-chosen="${green_xml:-${bamboo_xml:-$first_xml}}"
-if [[ -n "$chosen" ]]; then
-  apply_wallpaper "$chosen" || warn "não consegui aplicar o wallpaper padrão"
+sunrise_xml="$WP_XML_DIR/omakuba-ublue-sunrise.xml"
+
+if [[ -n "${OMAKUBA_WALLPAPER:-}" ]]; then
+  wp_override="$OMAKUBA_WALLPAPER"
+  [[ -f "$wp_override" ]] || wp_override="$WP_DST_DIR/$OMAKUBA_WALLPAPER"
+  [[ -f "$wp_override" ]] || wp_override="$WP_SRC_DIR/$OMAKUBA_WALLPAPER"
+  [[ -f "$wp_override" ]] || wp_override="$WP_XML_DIR/$OMAKUBA_WALLPAPER"
+
+  if [[ "$wp_override" == *.xml ]]; then
+    wallpaper_apply_xml "$wp_override" \
+      || warn "não consegui aplicar OMAKUBA_WALLPAPER=$OMAKUBA_WALLPAPER"
+  elif [[ -f "$wp_override" ]]; then
+    wallpaper_apply_image "$wp_override" \
+      || warn "não consegui aplicar OMAKUBA_WALLPAPER=$OMAKUBA_WALLPAPER"
+  else
+    warn "OMAKUBA_WALLPAPER não existe: $OMAKUBA_WALLPAPER"
+  fi
+elif [[ -f "$sunrise_xml" ]]; then
+  wallpaper_apply_xml "$sunrise_xml" \
+    || warn "não consegui aplicar o Sunrise"
+else
+  chosen="${green_xml:-${bamboo_xml:-$first_xml}}"
+  if [[ -n "$chosen" ]]; then
+    wallpaper_apply_xml "$chosen" || warn "não consegui aplicar o wallpaper padrão"
+  fi
 fi
 
-info "coloque mais imagens em dotfiles/backgrounds/ e rode ./install.sh 60-wallpapers"
+info "o padrão é o Sunrise da Universal Blue; o green forest fica de reserva"
+info "para escolher outro: OMAKUBA_WALLPAPER=/caminho/da/imagem ./install.sh 60-wallpapers"
 info "os wallpapers do Bluefin e da Universal Blue entram no passo 65-bluefin-wallpapers"

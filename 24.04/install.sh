@@ -20,6 +20,7 @@ source "$ROOT/lib/common.sh"
 
 ALL_STEPS=(
   "00-base"
+  "05-store"
   "10-fonts"
   "20-terminal"
   "30-dev"
@@ -38,7 +39,7 @@ WANT_UBUNTU="24.04"
 
 banner() {
   printf '\n\033[38;5;214momakuba para Ubuntu 24.04\033[0m\n'
-  printf '\033[2mGNOME 46, Adwaita, Forge como extra e o conjunto do Bluefin\033[0m\n'
+  printf '\033[2mGNOME 46, Adwaita, Bazaar, Forge como extra e o conjunto do Bluefin\033[0m\n'
 }
 
 usage() {
@@ -47,12 +48,13 @@ usage() {
 
   Passos:
     00-base        ferramentas do dia a dia via APT, Docker e lazygit
+    05-store       remove a Snap Store e deixa o Bazaar como loja gráfica
     10-fonts       JetBrainsMono Nerd Font
     20-terminal    Kitty, Zsh, Starship, plugins do Zsh e ajustes no GNOME Terminal
     30-dev         Node LTS, pnpm, yarn, .NET e ferramentas do dotnet
     40-vscode      instala o VS Code, extensões e settings
     50-gnome       extensões do Bluefin, dock do Ubuntu e ajustes de aparência
-    60-wallpapers  instala os wallpapers que estão em dotfiles/backgrounds
+    60-wallpapers  instala os wallpapers de dotfiles/backgrounds e aplica o padrão
     65-bluefin-wallpapers  baixa os wallpapers do Bluefin e da Universal Blue
     70-flatpaks    Flathub, Bazaar, Flatseal, Mission Center e os apps do Bluefin
     75-cli         Homebrew e o pacote de ferramentas de linha de comando
