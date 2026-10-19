@@ -33,13 +33,19 @@ Se preferir chamar direto:
 ./26.04/install.sh
 ```
 
-O script pede a senha do sudo no começo. Pode rodar quantas vezes quiser, porque
-cada passo confere o que já existe antes de mexer. Se você estiver na versão
-errada do Ubuntu, ele avisa e para. Para insistir:
+O script pede a senha do sudo no começo. A única exceção é o passo
+`90-dotfiles`, que só mexe no seu home e roda sem sudo. Pode rodar quantas vezes
+quiser, porque cada passo confere o que já existe antes de mexer. Se você
+estiver na versão errada do Ubuntu, ele avisa e para. Para insistir:
 
 ```bash
 OMAKUBA_FORCE=1 ./26.04/install.sh
 ```
+
+Cada passo aparece como `[n/total]` e os comandos mais demorados (downloads,
+clones, instalações) mostram um spinner com o que está acontecendo. Se um passo
+falha, ele anota, segue para o próximo e mostra o resumo no final, em vez de
+abortar tudo.
 
 ## O que muda entre as duas versões
 

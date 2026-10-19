@@ -19,7 +19,7 @@ if command -v code >/dev/null; then
     if printf '%s\n' "$existing" | grep -qixF "$ext"; then
       skip "$ext já instalada"
     else
-      code --install-extension "$ext" >/dev/null 2>&1 \
+      run_quiet "instalando $ext" code --install-extension "$ext" \
         && ok "$ext instalada" \
         || warn "$ext falhou"
     fi

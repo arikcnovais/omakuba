@@ -71,6 +71,42 @@ fetch() {
   curl -fsSL --retry 3 --retry-delay 2 --max-time 180 "$url" -o "$dest"
 }
 
+# run_quiet <mensagem> <comando...>
+# Roda um comando que costuma demorar mostrando um spinner, para não parecer
+# que o script travou. Se falhar, imprime o final da saída para ajudar.
+run_quiet() {
+  local msg="$1"; shift
+  [[ $# -gt 0 ]] || return 0
+
+  if [[ ! -t 1 ]]; then
+    "$@"
+    return $?
+  fi
+
+  local log pid rc i=0
+  local frames="|/-\\"
+  log="$(mktemp)"
+
+  "$@" >"$log" 2>&1 &
+  pid=$!
+
+  while kill -0 "$pid" 2>/dev/null; do
+    printf '\r  %s%s%s %s ' "$C_BLUE" "${frames:i:1}" "$C_RESET" "$msg"
+    i=$(( (i + 1) % 4 ))
+    sleep 0.12
+  done
+
+  rc=0
+  wait "$pid" || rc=$?
+  printf '\r\033[K'
+
+  if [[ $rc -ne 0 ]]; then
+    tail -n 15 "$log" | sed 's/^/      /' >&2
+  fi
+  rm -f "$log"
+  return $rc
+}
+
 # install_extension <uuid-ou-numero>
 # Baixa a extensão do extensions.gnome.org para a versão do GNOME em uso.
 # Se não houver versão compatível, avisa e segue.
@@ -92,6 +128,7 @@ install_extension() {
   fi
 
   local payload
+  info "procurando '$target' para o GNOME $shell_ver"
   if ! payload="$(fetch "$info" /dev/stdout 2>/dev/null)"; then
     warn "'$target' não tem versão para o GNOME $shell_ver (pulei)"
     return 0
@@ -102,8 +139,8 @@ install_extension() {
   [[ -n "$download" && -n "$uuid" ]] || { warn "'$target': veio sem download_url (pulei)"; return 0; }
 
   local tmp; tmp="$(mktemp -d)"
-  if fetch "https://extensions.gnome.org${download}" "$tmp/$uuid.zip" \
-     && gnome-extensions install --force "$tmp/$uuid.zip" >/dev/null 2>&1; then
+  if run_quiet "baixando $uuid" fetch "https://extensions.gnome.org${download}" "$tmp/$uuid.zip" \
+     && run_quiet "instalando $uuid" gnome-extensions install --force "$tmp/$uuid.zip"; then
     gnome-extensions enable "$uuid" >/dev/null 2>&1 || true
     ok "$uuid instalada"
   else

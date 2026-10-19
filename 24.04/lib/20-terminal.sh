@@ -6,7 +6,8 @@ apt_install kitty zsh
 if command -v starship >/dev/null; then
   skip "starship já instalado"
 else
-  if curl -fsSL --max-time 60 https://starship.rs/install.sh | sudo sh -s -- -y -b /usr/local/bin >/dev/null 2>&1; then
+  if run_quiet "instalando o starship" \
+       sudo bash -c 'curl -fsSL --max-time 60 https://starship.rs/install.sh | sh -s -- -y -b /usr/local/bin'; then
     ok "starship instalado"
   else
     warn "não consegui instalar o starship (pulei)"
@@ -21,7 +22,7 @@ for repo in zsh-users/zsh-autosuggestions zsh-users/zsh-syntax-highlighting zsh-
   if [[ -d "$ZSH_PLUGIN_DIR/$name" ]]; then
     skip "$name já está clonado"
   else
-    git clone --depth=1 "https://github.com/$repo.git" "$ZSH_PLUGIN_DIR/$name" >/dev/null 2>&1 \
+    run_quiet "clonando $name" git clone --depth=1 "https://github.com/$repo.git" "$ZSH_PLUGIN_DIR/$name" \
       && ok "$name clonado" \
       || warn "$name falhou (pulei)"
   fi

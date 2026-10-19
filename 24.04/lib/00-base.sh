@@ -43,11 +43,12 @@ else
     tag="$(curl -fsSL --max-time 60 https://api.github.com/repos/jesseduffield/lazygit/releases/latest \
       | jq -r '.tag_name // empty' 2>/dev/null || true)"
     ver="${tag#v}"
-    if [[ -n "$ver" ]] && fetch \
+    if [[ -n "$ver" ]] && run_quiet "baixando o lazygit" fetch \
       "https://github.com/jesseduffield/lazygit/releases/download/${tag}/lazygit_${ver}_Linux_${lg_arch}.tar.gz" \
-      "$tmp/lazygit.tar.gz" 2>/dev/null; then
-      sudo tar -xzf "$tmp/lazygit.tar.gz" -C /usr/local/bin lazygit \
-        && ok "lazygit instalado"
+      "$tmp/lazygit.tar.gz"; then
+      run_quiet "instalando o lazygit" sudo tar -xzf "$tmp/lazygit.tar.gz" -C /usr/local/bin lazygit \
+        && ok "lazygit instalado" \
+        || warn "não consegui instalar o lazygit (pulei)"
     else
       warn "não consegui baixar o lazygit (pulei)"
     fi

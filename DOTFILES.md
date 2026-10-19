@@ -41,5 +41,8 @@ git config --global --edit
 ./26.04/install.sh 90-dotfiles
 ```
 
+Esse passo não precisa de sudo, então dá para rodar só ele a qualquer momento
+para puxar as mudanças dos dotfiles.
+
 Os backups ficam em `~/.omakuba-backup-<data-hora>/`, com o caminho original
 preservado dentro. Se algo foi trocado e você quer de volta, é só olhar lá.

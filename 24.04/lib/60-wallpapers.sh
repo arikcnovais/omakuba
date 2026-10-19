@@ -7,18 +7,24 @@ if [[ -d "$WP_DIR" ]] && [[ -n "$(ls -A "$WP_DIR" 2>/dev/null)" ]]; then
   ok "os wallpapers dinâmicos já estão instalados"
 else
   tmp="$(mktemp -d)"
-  if fetch "https://raw.githubusercontent.com/Chillsmeit/linux-dynamic-wallpapers/main/full-install-remote.sh" "$tmp/full-install-remote.sh" 2>/dev/null; then
+  if run_quiet "baixando o instalador de wallpapers" fetch \
+    "https://raw.githubusercontent.com/Chillsmeit/linux-dynamic-wallpapers/main/full-install-remote.sh" \
+    "$tmp/full-install-remote.sh"; then
     # O instalador oficial pergunta no /dev/tty, então dou um "y" por uma PTY.
-    if printf 'y\n' | timeout 900 script -qec "bash $tmp/full-install-remote.sh" /dev/null >"$tmp/install.log" 2>&1; then
+    # Isso pode demorar, por isso o spinner.
+    if run_quiet "instalando os wallpapers dinâmicos (pode demorar)" \
+         bash -c "printf 'y\n' | timeout 900 script -qec 'bash $tmp/full-install-remote.sh' /dev/null"; then
       ok "wallpapers dinâmicos instalados"
     else
       warn "o instalador oficial falhou, vou pelo caminho manual"
       rm -rf /tmp/linux-dynamic-wallpapers
-      git clone --depth=1 https://github.com/Chillsmeit/linux-dynamic-wallpapers.git /tmp/linux-dynamic-wallpapers >/dev/null 2>&1 || true
+      run_quiet "baixando os wallpapers do GitHub" git clone --depth=1 \
+        https://github.com/Chillsmeit/linux-dynamic-wallpapers.git /tmp/linux-dynamic-wallpapers \
+        || true
       if [[ -d /tmp/linux-dynamic-wallpapers ]]; then
-        sudo mkdir -p /usr/share/backgrounds/ /usr/share/gnome-background-properties/
-        sudo cp -r /tmp/linux-dynamic-wallpapers/dynamic-wallpapers /usr/share/backgrounds/
-        sudo cp /tmp/linux-dynamic-wallpapers/xml/* /usr/share/gnome-background-properties/
+        run_quiet "copiando os wallpapers" sudo mkdir -p /usr/share/backgrounds/ /usr/share/gnome-background-properties/
+        run_quiet "copiando os wallpapers" sudo cp -r /tmp/linux-dynamic-wallpapers/dynamic-wallpapers /usr/share/backgrounds/
+        run_quiet "copiando os wallpapers" sudo cp /tmp/linux-dynamic-wallpapers/xml/* /usr/share/gnome-background-properties/
         rm -rf /tmp/linux-dynamic-wallpapers
         ok "wallpapers instalados do jeito manual"
       else
@@ -61,7 +67,7 @@ if [[ -f "$BAMBOO_SRC" ]]; then
   if [[ -f "$BAMBOO_DST" ]] && cmp -s "$BAMBOO_SRC" "$BAMBOO_DST"; then
     skip "o Bamboo já está no sistema"
   else
-    sudo install -Dm644 "$BAMBOO_SRC" "$BAMBOO_DST"
+    run_quiet "instalando o Bamboo" sudo install -Dm644 "$BAMBOO_SRC" "$BAMBOO_DST"
     ok "Bamboo copiado para $BAMBOO_DST"
   fi
 
@@ -84,7 +90,7 @@ XML
   if [[ -f "$BAMBOO_XML" ]] && cmp -s "$tmp_xml" "$BAMBOO_XML"; then
     skip "o Bamboo já aparece nas Configurações"
   else
-    sudo install -Dm644 "$tmp_xml" "$BAMBOO_XML"
+    run_quiet "registrando o Bamboo nas Configurações" sudo install -Dm644 "$tmp_xml" "$BAMBOO_XML"
     ok "Bamboo disponível em Configurações > Aparência > Papel de parede"
   fi
   rm -f "$tmp_xml"

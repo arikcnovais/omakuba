@@ -101,23 +101,51 @@ main() {
   fi
 
   check_ubuntu
-  require_sudo
+
+  # O passo 90-dotfiles só mexe no seu home, então não precisa de sudo.
+  if [[ ${#steps[@]} -eq 1 && "${steps[0]}" == "90-dotfiles" ]]; then
+    :
+  else
+    require_sudo
+  fi
   banner
 
-  local started total=0
+  local started total_steps index=0
+  local failed=()
   started=$(date +%s)
+  total_steps=${#steps[@]}
 
   for step_name in "${steps[@]}"; do
     local file="$ROOT/lib/${step_name}.sh"
     [[ -f "$file" ]] || die "passo desconhecido: '$step_name' (veja --list)"
-    total=$((total + 1))
-    printf '\n\033[1;38;5;208m%d. %s\033[0m\n' "$total" "$step_name"
+    index=$((index + 1))
+
+    printf '\n\033[1;38;5;208m[%d/%d] %s\033[0m\n' "$index" "$total_steps" "$step_name"
+    local step_start step_rc step_elapsed
+    step_start=$(date +%s)
+
+    # Um passo com problema não derruba o resto. Assim o 90-dotfiles roda
+    # mesmo que o download dos wallpapers, por exemplo, tenha falhado.
+    set +e
     # shellcheck disable=SC1090
     source "$file"
+    step_rc=$?
+    set -e
+
+    step_elapsed=$(( $(date +%s) - step_start ))
+    if [[ $step_rc -eq 0 ]]; then
+      ok "$step_name pronto em ${step_elapsed}s"
+    else
+      warn "$step_name terminou com erro ($step_rc), seguindo em frente"
+      failed+=("$step_name")
+    fi
   done
 
   local elapsed=$(( $(date +%s) - started ))
   printf '\n'
+  if [[ ${#failed[@]} -gt 0 ]]; then
+    warn "passos com problema: ${failed[*]}"
+  fi
   ok "terminei em ${elapsed}s. Bom trabalho."
 }
 
