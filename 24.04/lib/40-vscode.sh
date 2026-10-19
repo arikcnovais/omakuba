@@ -1,5 +1,20 @@
 # 40-vscode
-# Extensões do VS Code e merge das settings.
+# Instala o VS Code pelo repositório da Microsoft, instala as extensões e faz
+# o merge das settings.
+if ! command -v code >/dev/null 2>&1; then
+  step "adicionando o repositório do VS Code"
+  sudo install -d -m 0755 /etc/apt/keyrings
+  if run_quiet "baixando a chave da Microsoft" bash -c \
+       'curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /etc/apt/keyrings/microsoft.gpg >/dev/null'; then
+    printf 'deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main\n' \
+      | sudo tee /etc/apt/sources.list.d/vscode.list >/dev/null
+    sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq
+    apt_install code || warn "não consegui instalar o VS Code (pulei)"
+  else
+    warn "não consegui baixar a chave do VS Code (pulei)"
+  fi
+fi
+
 VS_EXTENSIONS=(
   ms-dotnettools.csharp
   ms-dotnettools.csdevkit
@@ -11,12 +26,15 @@ VS_EXTENSIONS=(
   ritwickdey.LiveServer
   redhat.vscode-yaml
   ms-azuretools.vscode-docker
+  ms-vscode-remote.remote-containers
+  ms-vscode-remote.remote-ssh
+  ms-azuretools.vscode-containers
 )
 
 if command -v code >/dev/null; then
   existing="$(code --list-extensions 2>/dev/null || true)"
   for ext in "${VS_EXTENSIONS[@]}"; do
-    if printf '%s\n' "$existing" | grep -qixF "$ext"; then
+    if printf '%s\n' "$existing" | grep -ixF "$ext" >/dev/null; then
       skip "$ext já instalada"
     else
       run_quiet "instalando $ext" code --install-extension "$ext" \

@@ -26,6 +26,11 @@ ALL_STEPS=(
   "40-vscode"
   "50-gnome"
   "60-wallpapers"
+  "65-bluefin-wallpapers"
+  "70-flatpaks"
+  "75-cli"
+  "80-dx"
+  "85-updates"
   "90-dotfiles"
 )
 
@@ -33,7 +38,7 @@ WANT_UBUNTU="24.04"
 
 banner() {
   printf '\n\033[38;5;214momakuba para Ubuntu 24.04\033[0m\n'
-  printf '\033[2mGNOME 46, Adwaita e Forge no lugar do tiling do sistema\033[0m\n'
+  printf '\033[2mGNOME 46, Adwaita, Forge como extra e o conjunto do Bluefin\033[0m\n'
 }
 
 usage() {
@@ -45,15 +50,23 @@ usage() {
     10-fonts       JetBrainsMono Nerd Font
     20-terminal    Kitty, Zsh, Starship, plugins do Zsh e ajustes no GNOME Terminal
     30-dev         Node LTS, pnpm, yarn, .NET e ferramentas do dotnet
-    40-vscode      extensões e settings do VS Code
-    50-gnome       Forge, Blur my Shell, Vitals, Caffeine e ajustes de aparência
+    40-vscode      instala o VS Code, extensões e settings
+    50-gnome       extensões do Bluefin, dock do Ubuntu e ajustes de aparência
     60-wallpapers  instala os wallpapers que estão em dotfiles/backgrounds
+    65-bluefin-wallpapers  baixa os wallpapers do Bluefin e da Universal Blue
+    70-flatpaks    Flathub, Bazaar, Flatseal, Mission Center e os apps do Bluefin
+    75-cli         Homebrew e o pacote de ferramentas de linha de comando
+    80-dx          camada DX do Bluefin, só com OMAKUBA_DX=1
+    85-updates     comando omakuba e atualização semanal dos apps
     90-dotfiles    copia os dotfiles, com backup do que já existe
 
   Uso:
     ./install.sh              tudo
     ./install.sh --list       só a lista
     ./install.sh 50-gnome     um passo específico
+
+  Para a camada DX (Podman Desktop, distrobox, virt-manager, Incus e k8s):
+    OMAKUBA_DX=1 ./install.sh
 
   Se estiver em outra versão do Ubuntu, o script para. Para insistir:
     OMAKUBA_FORCE=1 ./install.sh

@@ -10,10 +10,33 @@ apt_install \
   tree htop fzf ripgrep fd-find bat sqlite3 tmux vim git \
   dconf-editor gnome-tweaks xdg-utils
 
+# Ferramentas que o Bluefin traz e que fazem sentido num desktop. Uso a versão
+# opcional porque algumas não existem no 24.04 e não quero derrubar o passo.
+apt_install_optional \
+  gnome-shell-extension-manager solaar rclone restic smartmontools tcpdump \
+  fish just gum glow borgbackup cryfs davfs2 ddcutil evtest input-remapper \
+  lm-sensors powertop usbmuxd ifuse libimobiledevice-utils wireguard-tools \
+  wl-clipboard zenity x11-utils xdg-terminal-exec \
+  libavcodec-extra gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
+  gstreamer1.0-plugins-ugly gstreamer1.0-libav
+
+# Em versões mais antigas o xdg-terminal-exec pode não existir. O Logo Menu e
+# os atalhos do Bluefin usam ele, então deixo um fallback simples.
+if ! command -v xdg-terminal-exec >/dev/null 2>&1; then
+  sudo tee /usr/local/bin/xdg-terminal-exec >/dev/null <<'EOF'
+#!/usr/bin/env bash
+exec "${TERMINAL:-x-terminal-emulator}" "$@"
+EOF
+  sudo chmod 0755 /usr/local/bin/xdg-terminal-exec
+  ok "criei um xdg-terminal-exec de fallback"
+else
+  skip "xdg-terminal-exec já existe"
+fi
+
 # Docker já vem na maioria das instalações do Ubuntu. Aqui só garanto que o
 # serviço está de pé e que o seu usuário pode usar o daemon sem sudo.
 if getent group docker >/dev/null; then
-  if id -nG "$USER" | tr ' ' '\n' | grep -qx docker; then
+  if id -nG "$USER" | tr ' ' '\n' | grep -x docker >/dev/null; then
     skip "você já está no grupo docker"
   else
     sudo usermod -aG docker "$USER"

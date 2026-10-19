@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+#
+# omakuba
+# Um lugar só para as tarefas do dia a dia: atualizar os apps, ligar ou
+# desligar o dock e ver se o ambiente está saudável.
+#
+set -euo pipefail
+
+# O systemd user não herda o PATH do shell, então o Homebrew entra na mão.
+if [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/omakuba"
+DOCK_UUID="ubuntu-dock@ubuntu.com"
+
+usage() {
+  cat <<'EOF'
+omakuba
+
+  omakuba update            atualiza Flatpak e Homebrew do seu usuário
+  omakuba update --system   atualiza também o APT, com sudo
+  omakuba dock on           liga o dock do Ubuntu
+  omakuba dock off          desliga o dock (fica só a visão geral)
+  omakuba dock status       mostra se o dock está ligado
+  omakuba doctor            mostra versões e o estado do ambiente
+  omakuba help              esta ajuda
+
+  O update sem --system é o que o timer semanal roda. O APT fica por conta
+  do unattended-upgrades do Ubuntu, que já cuida das atualizações de segurança.
+EOF
+}
+
+cmd_update() {
+  local do_system=0
+  [[ "${1:-}" == "--system" ]] && do_system=1
+
+  if [[ "$do_system" -eq 1 ]]; then
+    printf '> APT\n'
+    sudo apt-get update
+    sudo DEBIAN_FRONTEND=noninteractive apt-get -y upgrade
+    sudo DEBIAN_FRONTEND=noninteractive apt-get -y autoremove
+  fi
+
+  if command -v flatpak >/dev/null 2>&1; then
+    printf '> Flatpak do usuário\n'
+    flatpak update --user -y --noninteractive || true
+  fi
+
+  if command -v brew >/dev/null 2>&1; then
+    printf '> Homebrew\n'
+    brew update || true
+    brew upgrade || true
+  fi
+
+  if command -v code >/dev/null 2>&1; then
+    printf '> Extensões do VS Code\n'
+    code --update-extensions >/dev/null 2>&1 || true
+  fi
+
+  printf 'ok, tudo atualizado.\n'
+}
+
+cmd_dock() {
+  local action="${1:-status}"
+  case "$action" in
+    on)
+      rm -f "$CONFIG_DIR/dock-disabled"
+      gnome-extensions enable "$DOCK_UUID" >/dev/null 2>&1 || true
+      printf 'dock ligado.\n'
+      ;;
+    off)
+      mkdir -p "$CONFIG_DIR"
+      touch "$CONFIG_DIR/dock-disabled"
+      gnome-extensions disable "$DOCK_UUID" >/dev/null 2>&1 || true
+      printf 'dock desligado. Para voltar: omakuba dock on\n'
+      ;;
+    status)
+      if [[ -f "$CONFIG_DIR/dock-disabled" ]]; then
+        printf 'dock desligado por você.\n'
+      elif gnome-extensions list --enabled 2>/dev/null | grep -xF "$DOCK_UUID" >/dev/null; then
+        printf 'dock ligado.\n'
+      else
+        printf 'dock desligado.\n'
+      fi
+      ;;
+    *)
+      printf 'uso: omakuba dock on|off|status\n' >&2
+      return 1
+      ;;
+  esac
+}
+
+pretty_version() {
+  local cmd="$1"
+  if command -v "$cmd" >/dev/null 2>&1; then
+    "$cmd" --version 2>/dev/null | sed -n '1p'
+  else
+    echo ausente
+  fi
+}
+
+cmd_doctor() {
+  printf '%-18s %s\n' "Ubuntu" "$(. /etc/os-release 2>/dev/null; printf '%s' "${PRETTY_NAME:-?}")"
+  printf '%-18s %s\n' "GNOME" "$(pretty_version gnome-shell)"
+  printf '%-18s %s\n' "Flatpak" "$(pretty_version flatpak)"
+  printf '%-18s %s\n' "Homebrew" "$(pretty_version brew)"
+  printf '%-18s %s\n' "Docker" "$(pretty_version docker)"
+  printf '%-18s %s\n' "Podman" "$(pretty_version podman)"
+  printf '%-18s %s\n' "VS Code" "$(pretty_version code)"
+  if command -v tailscale >/dev/null 2>&1; then
+    printf '%-18s %s\n' "Tailscale" "$(tailscale version 2>/dev/null | sed -n '1p')"
+  else
+    printf '%-18s %s\n' "Tailscale" "ausente"
+  fi
+  printf '\nExtensões ligadas:\n'
+  gnome-extensions list --enabled 2>/dev/null | sed 's/^/  /' || true
+  printf '\nDisco em %s:\n' "$HOME"
+  df -h "$HOME" | sed 's/^/  /'
+}
+
+case "${1:-help}" in
+  update) shift; cmd_update "$@" ;;
+  dock)   shift; cmd_dock "$@" ;;
+  doctor) cmd_doctor ;;
+  help|-h|--help|"") usage ;;
+  *)
+    printf "não conheço o comando '%s'.\n\n" "$1" >&2
+    usage >&2
+    exit 1
+    ;;
+esac

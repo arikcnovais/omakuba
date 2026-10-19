@@ -1,7 +1,7 @@
 # 10-fonts
 # JetBrainsMono Nerd Font. Uso no terminal, no VS Code e no GNOME.
 FONT_ROOT="$HOME/.local/share/fonts"
-if fc-list 2>/dev/null | grep -qi "JetBrainsMono Nerd Font Mono"; then
+if fc-list 2>/dev/null | grep -i "JetBrainsMono Nerd Font Mono" >/dev/null; then
   skip "JetBrainsMono Nerd Font já instalada"
 else
   tmp="$(mktemp -d)"

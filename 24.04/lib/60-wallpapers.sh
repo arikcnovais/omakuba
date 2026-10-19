@@ -1,7 +1,7 @@
 # 60-wallpapers
 # Pega as imagens que você deixar em dotfiles/backgrounds/ e instala todas no
 # sistema, criando o XML que faz cada uma aparecer em Configurações, Aparência,
-# Papel de parede. O Bamboo fica como padrão quando está na pasta.
+# Papel de parede. O green forest fica como padrão quando está na pasta.
 
 WP_SRC_DIR="${WP_SRC_DIR:-$DOTFILES_DIR/backgrounds}"
 WP_DST_DIR="${WP_DST_DIR:-/usr/share/backgrounds/omakuba}"
@@ -15,6 +15,8 @@ wallpaper_name() {
   base="${base//-/ }"
   if [[ "$base" == [Bb]amboo* ]]; then
     printf 'Bamboo (omakuba)'
+  elif [[ "$base" == [Gg]reen[[:space:]]*[Ff]orest ]]; then
+    printf 'Green Forest (omakuba)'
   else
     printf '%s (omakuba)' "$base"
   fi
@@ -44,7 +46,7 @@ apply_wallpaper() {
   [[ -f "$prop" ]] || return 1
 
   local target uri
-  target="$(sed -n 's:.*<filename>\([^<]*\)</filename>.*:\1:p' "$prop" | head -1)"
+  target="$(sed -n 's:.*<filename>\([^<]*\)</filename>.*:\1:p' "$prop" | sed -n '1p')"
   [[ -n "$target" && -e "$target" ]] || return 1
   uri="$(file_uri "$target")"
 
@@ -59,6 +61,7 @@ apply_wallpaper() {
   return 0
 }
 
+green_xml=""
 bamboo_xml=""
 first_xml=""
 count=0
@@ -107,6 +110,7 @@ XML
     rm -f "$tmp_xml"
 
     [[ -z "$first_xml" ]] && first_xml="$xml"
+    [[ "$slug" == green-forest* ]] && green_xml="$xml"
     [[ "$slug" == bamboo* ]] && bamboo_xml="$xml"
   done
   shopt -u nullglob nocaseglob
@@ -116,9 +120,10 @@ XML
   fi
 fi
 
-chosen="${bamboo_xml:-$first_xml}"
+chosen="${green_xml:-${bamboo_xml:-$first_xml}}"
 if [[ -n "$chosen" ]]; then
   apply_wallpaper "$chosen" || warn "não consegui aplicar o wallpaper padrão"
 fi
 
 info "coloque mais imagens em dotfiles/backgrounds/ e rode ./install.sh 60-wallpapers"
+info "os wallpapers do Bluefin e da Universal Blue entram no passo 65-bluefin-wallpapers"
