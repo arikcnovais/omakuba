@@ -144,7 +144,9 @@ else
 fi
 # Popups: quero os cantos arredondados, senão fica quadrado e com uns encaixes
 # estranhos. Nas versões que têm o pipeline "Default rounded" aponto para ele.
-# Nas mais novas, que arredondam por chave, ligo as chaves de canto.
+# Nas mais novas, que arredondam por chave, rounded-corners 0 quer dizer
+# "os quatro cantos" e o raio vem de corner-radius.
+ext_gs "$BLUR_UUID" org.gnome.shell.extensions.blur-my-shell.popup blur true
 if blur_has_pipeline "$BLUR_UUID" "pipeline_default_rounded"; then
   ext_gs "$BLUR_UUID" org.gnome.shell.extensions.blur-my-shell.popup pipeline "'pipeline_default_rounded'"
 else
