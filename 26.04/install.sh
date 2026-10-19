@@ -43,7 +43,7 @@ usage() {
   Passos:
     00-base        ferramentas do dia a dia via APT, Docker e lazygit
     10-fonts       JetBrainsMono Nerd Font
-    20-terminal    Kitty, Zsh, Starship, plugins do Zsh e um ajuste no Ptyxis
+    20-terminal    Kitty, Zsh, Starship, plugins do Zsh, ajustes e logo do Ptyxis
     30-dev         Node LTS, pnpm, yarn, .NET 10 e ferramentas do dotnet
     40-vscode      extensões e settings do VS Code
     50-gnome       Blur my Shell, Vitals, Caffeine e ajustes de aparência

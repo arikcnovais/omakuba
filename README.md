@@ -58,9 +58,9 @@ O resto é igual nas duas: Adwaita, Kitty, Zsh, Starship, workspaces fixos, o at
 do Kitty e os ajustes de aparência.
 
 O 26.04 troca o GNOME Terminal pelo Ptyxis. O script ajusta a fonte, o cursor e
-a opacidade do Ptyxis, mas o terminal principal do setup continua sendo o Kitty.
-A paleta Breath fica no Kitty, no tmux e no prompt, porque o Ptyxis escolhe
-paleta por nome.
+a opacidade do Ptyxis, que fica como terminal padrão do sistema. O Kitty
+continua sendo o terminal principal do setup, no atalho e no dock, e a paleta
+Breath fica nele, no tmux e no prompt, porque o Ptyxis escolhe paleta por nome.
 
 O .NET também muda um pouco. O 26.04 já traz o SDK 10 nos repositórios oficiais.
 O SDK 8 não está lá, então o script tenta instalar e segue sem ele se não achar.
@@ -73,7 +73,7 @@ explicado na página de instalação do .NET no Ubuntu.
 |---|---|
 | `00-base` | ferramentas do dia a dia via APT, Docker e lazygit |
 | `10-fonts` | JetBrainsMono Nerd Font em `~/.local/share/fonts` |
-| `20-terminal` | Kitty, Zsh como shell padrão, Starship, plugins do Zsh e um ajuste no terminal do sistema |
+| `20-terminal` | Kitty, Zsh como shell padrão, Starship, plugins do Zsh e ajustes no terminal do sistema (Ptyxis no 26.04, GNOME Terminal no 24.04) |
 | `30-dev` | nvm, Node LTS, pnpm, yarn, .NET e ferramentas do dotnet |
 | `40-vscode` | extensões do VS Code e merge das settings |
 | `50-gnome` | extensões do GNOME, dock, workspaces e o atalho do Kitty |

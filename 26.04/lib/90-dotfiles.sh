@@ -23,21 +23,32 @@ deploy kitty.conf    "$HOME/.config/kitty/kitty.conf"
 deploy starship.toml "$HOME/.config/starship.toml"
 # O settings.json do VS Code é mesclado no passo 40-vscode, não copiado aqui.
 
-# Kitty como terminal preferido do sistema.
-if command -v kitty >/dev/null; then
+# Terminal preferido do sistema: o Ptyxis, que é o padrão do Ubuntu 26.04.
+# O Kitty continua no atalho Super+Return e nos favoritos do dock.
+XDG_TERM=""
+if [[ -f /usr/share/applications/org.gnome.Ptyxis.desktop ]]; then
+  XDG_TERM="org.gnome.Ptyxis.desktop"
+elif command -v kitty >/dev/null; then
+  XDG_TERM="kitty.desktop"
+fi
+
+if [[ -n "$XDG_TERM" ]]; then
   XDG_LIST="$HOME/.config/xdg-terminals.list"
   mkdir -p "$HOME/.config"
-  if [[ -f "$XDG_LIST" ]] && grep -qxF "kitty.desktop" "$XDG_LIST"; then
-    skip "o Kitty já é o terminal preferido"
+  if [[ -f "$XDG_LIST" ]] && grep -qxF "$XDG_TERM" "$XDG_LIST"; then
+    skip "$XDG_TERM já é o terminal preferido"
   else
     [[ -f "$XDG_LIST" ]] && backup_file "$XDG_LIST"
     if [[ -f "$XDG_LIST" ]]; then
-      { printf 'kitty.desktop\n'; grep -vxE 'kitty(\.desktop)?' "$XDG_LIST" || true; } > "$XDG_LIST.tmp"
+      {
+        printf '%s\n' "$XDG_TERM"
+        grep -vxE 'kitty(\.desktop)?|org\.gnome\.Ptyxis\.desktop|org\.gnome\.Terminal\.desktop' "$XDG_LIST" || true
+      } > "$XDG_LIST.tmp"
       mv "$XDG_LIST.tmp" "$XDG_LIST"
     else
-      printf 'kitty.desktop\n' > "$XDG_LIST"
+      printf '%s\n' "$XDG_TERM" > "$XDG_LIST"
     fi
-    ok "Kitty marcado como terminal preferido"
+    ok "$XDG_TERM marcado como terminal preferido"
   fi
 fi
 

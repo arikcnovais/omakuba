@@ -60,6 +60,21 @@ if command -v ptyxis >/dev/null; then
     gs "$PTX" opacity 0.92
     gs "$PTX" scrollback-lines 10000
   fi
+
+  # O Adwaita não traz ícone do Ptyxis. O hicolor serve de fallback para todos
+  # os temas, então o logo novo entra lá.
+  PTX_ICON_SRC="$DOTFILES_DIR/icons/hicolor/apps/org.gnome.Ptyxis.svg"
+  PTX_ICON_DST="/usr/share/icons/hicolor/scalable/apps/org.gnome.Ptyxis.svg"
+  if [[ -f "$PTX_ICON_SRC" ]]; then
+    if [[ -f "$PTX_ICON_DST" ]] && cmp -s "$PTX_ICON_SRC" "$PTX_ICON_DST"; then
+      skip "logo do Ptyxis já está atualizado"
+    else
+      run_quiet "instalando o logo do Ptyxis" sudo install -Dm644 "$PTX_ICON_SRC" "$PTX_ICON_DST"
+      sudo gtk-update-icon-cache -f -t /usr/share/icons/hicolor >/dev/null 2>&1 || true
+      ok "logo do Ptyxis instalado em $PTX_ICON_DST"
+    fi
+  fi
+
   ok "Ptyxis ajustado (fonte, cursor, opacidade e scrollback)"
 fi
 

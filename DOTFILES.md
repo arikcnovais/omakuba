@@ -8,20 +8,24 @@ Se já existir algo no destino, o original é guardado antes em
 | Arquivo | Vai para | Para que serve |
 |---|---|---|
 | `zshrc` | `~/.zshrc` | histórico de 50 mil linhas, completion com menu, plugins, PATH com nvm e `~/.dotnet/tools`, aliases de dev e o prompt do Starship. Coisas só suas cabem em `~/.zshrc.local`. |
-| `kitty.conf` | `~/.config/kitty/kitty.conf` | terminal padrão do setup, com a fonte Nerd, a paleta Breath, scrollback de 10 mil linhas e atalhos de abas. |
+| `kitty.conf` | `~/.config/kitty/kitty.conf` | terminal principal do setup, com a fonte Nerd, a paleta Breath, scrollback de 10 mil linhas e atalhos de abas. |
 | `starship.toml` | `~/.config/starship.toml` | prompt curto: pasta, branch, status, Node ou .NET. |
 | `vimrc` | `~/.vimrc` | Vim de emergência: numeração, cursorline, busca inteligente, undo persistente e clipboard do sistema. |
 | `tmux.conf` | `~/.tmux.conf` | sessões que sobrevivem à queda de conexão, mouse, histórico de 50 mil linhas, índices a partir de 1 e barra discreta. |
 | `vscode-settings.json` | `~/.config/Code/User/settings.json` | settings de web e C#, com format on save, minimap desligado e telemetria off. O passo `40-vscode` faz merge e nunca sobrescreve o que você já escolheu. |
 | `backgrounds/` | `/usr/share/backgrounds/omakuba/` | seus wallpapers. O passo `60-wallpapers` instala todas as imagens da pasta e cria o XML que faz cada uma aparecer em Configurações, Aparência, Papel de parede. O Bamboo, se estiver na pasta, vira o padrão. |
 
+O ícone do Ptyxis fica em `dotfiles/icons/` e é a exceção: quem instala é o
+`20-terminal`, porque o destino é `/usr/share/icons` e precisa de sudo.
+
 ## O que o script configura fora dos dotfiles
 
 | Onde | O quê | Passo |
 |---|---|---|
-| `~/.config/xdg-terminals.list` | deixa o Kitty como terminal preferido do sistema, com a entrada `kitty.desktop` | `90-dotfiles` |
+| `~/.config/xdg-terminals.list` | no 26.04 deixa o Ptyxis (`org.gnome.Ptyxis.desktop`) como terminal preferido do sistema. No 24.04, o GNOME Terminal (`org.gnome.Terminal.desktop`) | `90-dotfiles` |
 | GNOME Terminal | perfil omakuba, com a paleta Breath, a Nerd Font e 8% de transparência. No 26.04 isso só acontece se você tiver instalado o GNOME Terminal por conta própria | `20-terminal` |
 | Ptyxis | fonte, cursor, opacidade e scrollback. Só no 26.04, que é onde ele é o terminal padrão | `20-terminal` |
+| `/usr/share/icons/hicolor/scalable/apps/org.gnome.Ptyxis.svg` | logo novo do Ptyxis, copiado de `dotfiles/icons/`, e cache do hicolor atualizado. O hicolor é o fallback que o Adwaita usa. Só no 26.04 | `20-terminal` |
 | gsettings e dconf | Adwaita dark, dock enxuto, 5 workspaces fixos, `Super+Return`, favoritos do dock, relógio curto, desktop sem ícones e o wallpaper padrão | `50-gnome` e `60-wallpapers` |
 | Extensões do GNOME | no 24.04: Forge, Blur my Shell, Vitals e Caffeine. No 26.04: Blur my Shell, Vitals e Caffeine | `50-gnome` |
 | Extensões do VS Code | C#, C# Dev Kit, ESLint, Prettier, EditorConfig, Docker, YAML e mais algumas | `40-vscode` |
