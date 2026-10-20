@@ -87,7 +87,7 @@ explicado na página de instalação do .NET no Ubuntu.
 | `00-base` | ferramentas do dia a dia via APT, Docker, lazygit e alguns extras do Bluefin que existem nos repositórios do Ubuntu |
 | `05-store` | remove a Snap Store e o pacote `ubuntu-software`, mas mantém o `snapd` e o comando `snap` para a linha de comando |
 | `10-fonts` | JetBrainsMono Nerd Font em `~/.local/share/fonts` |
-| `15-branding` | o `/etc/os-release` com o nome Omakuba (configurável por `OMAKUBA_BRAND_NAME`), o logo do Bluefin e o fastfetch com o layout e as cores dele |
+| `15-branding` | o `/etc/os-release` com o nome Omakuba (configurável por `OMAKUBA_BRAND_NAME`), o logo do Bluefin, o logo do About do GNOME (o dodô, com backup dos originais do Ubuntu em `/usr/share/pixmaps/*.omakuba-backup`), o watermark do Plymouth e o fastfetch com o layout e as cores dele |
 | `20-terminal` | Kitty, Zsh como shell padrão, Starship, plugins do Zsh e o terminal padrão do sistema (Ptyxis no 26.04, GNOME Terminal no 24.04) |
 | `30-dev` | nvm, Node LTS, pnpm, yarn, .NET e ferramentas do dotnet |
 | `40-vscode` | instala o VS Code pelo repositório da Microsoft, instala as extensões e faz o merge das settings |
@@ -106,7 +106,7 @@ explicado na página de instalação do .NET no Ubuntu.
 |---|---|
 | Janelas | no 24.04, Forge com tiling em árvore e gaps de 8px; no 26.04, o tiling padrão do GNOME |
 | Desktop | Adwaita dark, com o acento slate (o mesmo do Bluefin) e o adw-gtk3 nos apps GTK3, que trocam sozinhos entre claro e escuro conforme o sistema; os apps em Flatpak e snap também usam o mesmo tema; as pastas acompanham a cor do acento pelo Accent Icons; dock do Ubuntu na barra lateral esquerda, altura total, auto-hide, lixeira e sem cantos quentes |
-| Identidade | o sistema se chama Omakuba no `/etc/os-release`, com o logo do Bluefin, e o fastfetch usa o layout, o logo e as cores do Bluefin |
+| Identidade | o sistema se chama Omakuba no `/etc/os-release`, o logo do Bluefin aparece no os-release e no About do GNOME (o dodô, sem texto), o watermark do Plymouth é o mesmo dodô e o fastfetch usa o layout, o logo e as cores do Bluefin |
 | Profundidade | Blur my Shell na barra, no dock e na visão geral, com os popups no pipeline arredondado e blur estático |
 | Extensões | AppIndicator, Dash to Dock, Blur my Shell, GSConnect, Search Light, Logo Menu, Caffeine, Custom Command Menu, Legacy (GTK3) Theme Scheme Auto Switcher, Bazaar Companion no 26.04 e Accent Icons no GNOME 47+ |
 | Métricas | Vitals com CPU, memória, disco e rede na barra |
@@ -262,7 +262,7 @@ lá eu só ajusto fonte, cursor e opacidade.
 Se quiser trocar de paleta, os hexadecimais ficam em `dotfiles/kitty.conf`,
 `dotfiles/tmux.conf` e em `26.04/lib/20-terminal.sh` ou `24.04/lib/20-terminal.sh`.
 
-## Identidade: os-release, logo e fastfetch
+## Identidade: os-release, logos, Plymouth e fastfetch
 
 O passo `15-branding` dá nome ao sistema. Ele troca o `/etc/os-release` do
 Ubuntu por um com a marca do omakuba:
@@ -295,26 +295,42 @@ FASTFETCH_THEME=blue omakuba-fastfetch   # OMAKUBA_FASTFETCH_THEME também vale
 omakuba fetch            # o mesmo comando, pelo atalho do omakuba
 ```
 
+O mesmo dodô vira o logo do About do GNOME, sem texto. No 26.04 o
+`gnome-control-center` usa `/usr/share/pixmaps/ubuntu-logo-text.svg` e
+`ubuntu-logo-text-dark.svg`; no 24.04, os PNGs `ubuntu-logo-text.png` e
+`ubuntu-logo-text-dark.png`. O passo grava o dodô nos dois arquivos da sua
+versão e guarda os originais do Ubuntu na mesma pasta, como
+`*.omakuba-backup`.
+
+O Plymouth segue a ideia do Bluefin: o watermark do tema `spinner` vira o
+dodô. No Ubuntu o tema padrão é o `bgrt`, que usa as imagens do `spinner`,
+então não é preciso trocar o tema padrão. O passo roda `update-initramfs -u`
+para a imagem entrar no initramfs e guarda o original em
+`/usr/share/plymouth/themes/spinner/watermark.png.omakuba-backup`.
+
 A marca também não é cravada: por padrão é `Omakuba`, mas dá para trocar sem
 editar o script. O `VARIANT` sai do nome em minúsculas se você não informar:
 
 ```bash
-OMAKUBA_BRAND_NAME="Minha Distro" OMAKUBA_BRAND_VARIANT=mydistro ./install.sh 15-branding
+OMAKUBA_BRAND_NAME="Meu Sistema" OMAKUBA_BRAND_VARIANT=meusistema ./install.sh 15-branding
 ```
 
 O `omakuba-image-info` também é genérico: ele lê o nome e a versão do
 `/etc/os-release` e só mostra a base quando ela é diferente.
 
 O `fastfetch` normal e o `neofetch` viram um alias para o `omakuba-fastfetch` no
-shell novo. Se um upgrade do `base-files` devolver o `os-release` do Ubuntu,
-basta rodar o passo de novo:
+shell novo. Se um upgrade do `base-files` devolver o `os-release` ou os logos
+do About, ou um upgrade do Plymouth devolver o watermark, basta rodar o passo
+de novo:
 
 ```bash
 ./install.sh 15-branding
 ```
 
-Se quiser voltar ao original, o backup está em `~/.omakuba-backup-<data>/etc/`
-ou no próprio `/usr/lib/os-release`.
+Se quiser voltar ao original, o backup do `os-release` está em
+`~/.omakuba-backup-<data>/etc/` (ou no próprio `/usr/lib/os-release`); os logos
+do About e o watermark do Plymouth ficam nos `*.omakuba-backup` ao lado dos
+arquivos.
 
 ## Depois de instalar
 

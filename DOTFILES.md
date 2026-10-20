@@ -24,9 +24,9 @@ Se já existir algo no destino, o original é guardado antes em
 
 O ícone do Ptyxis fica em `dotfiles/icons/` e é a exceção: quem instala é o
 `20-terminal`, porque o destino é `/usr/share/icons` e precisa de sudo. O mesmo
-vale para o `/etc/os-release` e o `/usr/share/pixmaps/omakuba.png`, que o
-`15-branding` grava com sudo. Todo o resto do branding (fastfetch, logos) fica
-no seu home, sem sudo.
+vale para o `/etc/os-release`, o `/usr/share/pixmaps/omakuba.png`, os logos do
+About e o watermark do Plymouth, que o `15-branding` grava com sudo. Todo o
+resto do branding (fastfetch, logos) fica no seu home, sem sudo.
 
 ## O que o script configura fora dos dotfiles
 
@@ -35,7 +35,11 @@ no seu home, sem sudo.
 | `~/.config/xdg-terminals.list` | no 26.04 deixa o Ptyxis (`org.gnome.Ptyxis.desktop`) no topo, que é o terminal preferido do sistema; no 24.04, o GNOME Terminal (`org.gnome.Terminal.desktop`). O `20-terminal` do 26.04 também garante o `x-terminal-emulator` e o `x-scheme-handler/terminal` apontando para o Ptyxis | `20-terminal` e `90-dotfiles` |
 | `/etc/os-release` | a marca do omakuba (`NAME`, `PRETTY_NAME`/`VERSION` com o codename da base, `LOGO`, `VARIANT`), mantendo `ID`, `VERSION_ID` e `UBUNTU_CODENAME` do Ubuntu. O `/usr/lib/os-release` continua o original | `15-branding` |
 | `/usr/share/pixmaps/omakuba.png` | o logo do Bluefin, que o `LOGO=omakuba` do os-release usa | `15-branding` |
+| `/usr/share/pixmaps/ubuntu-logo-text.svg` e `ubuntu-logo-text-dark.svg` (26.04) | o logo do About do GNOME: o dodô do Bluefin, sem texto. Os originais do Ubuntu ficam em `*.omakuba-backup` na mesma pasta | `15-branding` |
+| `/usr/share/pixmaps/ubuntu-logo-text.png` e `ubuntu-logo-text-dark.png` (24.04) | o logo do About do GNOME: o dodô do Bluefin em 192x192, o mesmo desenho do SVG do 26.04 (o PNG vem de `dotfiles/branding/bluefin-about.png`). Os originais ficam em `*.omakuba-backup` na mesma pasta | `15-branding` |
+| `/usr/share/plymouth/themes/spinner/watermark.png` | o watermark do Plymouth com o dodô do Bluefin. O original fica em `watermark.png.omakuba-backup` e o passo roda `update-initramfs -u` | `15-branding` |
 | `~/.local/share/omakuba/branding/logos/` | os logos do Bluefin (símbolos ANSI e PNG) que o `omakuba-fastfetch` sorteia | `15-branding` |
+| `~/.local/share/omakuba/branding/plymouth/watermark.png` | o watermark do Bluefin baixado para o Plymouth | `15-branding` |
 | GNOME Terminal | perfil omakuba, com a paleta Breath, a Nerd Font e 8% de transparência. No 26.04 isso só acontece se você tiver instalado o GNOME Terminal por conta própria | `20-terminal` |
 | Ptyxis | fonte, cursor, opacidade, scrollback e o `x-terminal-emulator`/`x-scheme-handler/terminal` apontando para ele. Só no 26.04, que é onde ele é o terminal padrão e o favorito do dock | `20-terminal` |
 | `/usr/share/icons/hicolor/scalable/apps/org.gnome.Ptyxis.svg` | logo novo do Ptyxis, copiado de `dotfiles/icons/`, e cache do hicolor atualizado. O hicolor é o fallback que o Adwaita usa. Só no 26.04 | `20-terminal` |

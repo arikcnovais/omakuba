@@ -153,7 +153,7 @@
           <tr><td><code>OMAKUBA_FULL_FLATPAKS=1 ./install.sh 70-flatpaks</code></td><td>instala também o conjunto completo do GNOME em Flatpak (Firefox, Thunderbird…)</td></tr>
           <tr><td><code>OMAKUBA_TAILSCALE=1 ./install.sh 75-cli</code></td><td>inclui o Tailscale no pacote de linha de comando</td></tr>
           <tr><td><code>OMAKUBA_WALLPAPER=/caminho/img ./install.sh 60-wallpapers</code></td><td>aplica um wallpaper na hora, em vez de deixar o seu</td></tr>
-          <tr><td><code>OMAKUBA_BRAND_NAME="Minha Distro" ./install.sh 15-branding</code></td><td>troca o nome que aparece no <code>os-release</code>, no logo e no fastfetch</td></tr>
+          <tr><td><code>OMAKUBA_BRAND_NAME="Meu Sistema" ./install.sh 15-branding</code></td><td>troca o nome que aparece no <code>os-release</code> e no fastfetch</td></tr>
           <tr><td><code>OMAKUBA_VERBOSE=1 ./install.sh</code></td><td>mostra avisos detalhados, inclusive chaves de gsettings que não existem na sua versão</td></tr>
         </tbody>
       </table>
@@ -163,8 +163,10 @@
       <strong>O script não é root e não deve ser chamado com sudo.</strong>
       Ele usa <code>sudo</code> nos passos que precisam. O <code>90-dotfiles</code>
       roda como você e só toca no seu home. Se algo der errado, o backup do que
-      existia está em <code>~/.omakuba-backup-&lt;data&gt;/</code>, e o
-      <code>/usr/lib/os-release</code> original nunca é sobrescrito.
+      existia está em <code>~/.omakuba-backup-&lt;data&gt;/</code>, o
+      <code>/usr/lib/os-release</code> original nunca é sobrescrito e os logos
+      do About e o watermark do Plymouth ficam em <code>*.omakuba-backup</code>
+      ao lado dos originais.
     </div>
   </section>
 
@@ -287,6 +289,8 @@
         <ul>
           <li><code>/etc/os-release</code> com o nome Omakuba</li>
           <li>logo no <code>/usr/share/pixmaps</code></li>
+          <li>o mesmo dodô no About do GNOME, sem texto</li>
+          <li>watermark do Plymouth com o dodô do Bluefin</li>
           <li>fastfetch com o layout e as cores do Bluefin</li>
           <li>sorteio de logo e acento seguindo o GNOME</li>
         </ul>
@@ -398,7 +402,7 @@
           <tr><td class="step-name">00-base</td><td>ferramentas do dia a dia via APT, Docker, lazygit e os extras do Bluefin que existem no Ubuntu</td></tr>
           <tr><td class="step-name">05-store</td><td>remove a Snap Store e o <code>ubuntu-software</code>; mantém o <code>snapd</code> e o comando <code>snap</code></td></tr>
           <tr><td class="step-name">10-fonts</td><td>JetBrainsMono Nerd Font em <code>~/.local/share/fonts</code></td></tr>
-          <tr><td class="step-name">15-branding</td><td>o <code>/etc/os-release</code> com o nome configurável, o logo e o fastfetch</td></tr>
+          <tr><td class="step-name">15-branding</td><td>o <code>/etc/os-release</code> com o nome configurável, o logo, o About do GNOME, o Plymouth e o fastfetch</td></tr>
           <tr><td class="step-name">20-terminal</td><td>Kitty, Zsh como shell padrão, Starship, plugins e o terminal do sistema (Ptyxis ou GNOME Terminal)</td></tr>
           <tr><td class="step-name">30-dev</td><td>nvm, Node LTS, pnpm, yarn, .NET e as ferramentas do dotnet</td></tr>
           <tr><td class="step-name">40-vscode</td><td>VS Code pelo repositório da Microsoft, extensões e merge das settings</td></tr>

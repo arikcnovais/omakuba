@@ -1,13 +1,15 @@
 # 15-branding
 # A identidade do sistema: o /etc/os-release com o nosso nome, o logo do
-# Bluefin no sistema e o fastfetch com o layout e as cores do Bluefin.
+# Bluefin no sistema, o logo do About do GNOME, o watermark do Plymouth e o
+# fastfetch com o layout e as cores do Bluefin.
 #
 # O nome é configurável (OMAKUBA_BRAND_NAME e OMAKUBA_BRAND_VARIANT); o padrão
 # é "Omakuba". Assim o passo serve para qualquer derivado, sem nome cravado.
 #
 # Tudo que é do usuário (o fastfetch, os logos do fastfetch) vai para o home e
-# roda sem sudo. Só o /etc/os-release e o logo do sistema precisam de sudo,
-# porque são arquivos do sistema. Nada é escrito no /root.
+# roda sem sudo. O /etc/os-release, o logo do sistema, o logo do About e o
+# watermark do Plymouth precisam de sudo, porque são arquivos do sistema. Nada
+# é escrito no /root.
 #
 # As artes vêm do repositório projectbluefin/common, o mesmo de onde o Bluefin
 # tira os logos dele.
@@ -19,8 +21,16 @@ BRAND_SHARE="${XDG_DATA_HOME:-$HOME/.local/share}/omakuba/branding"
 BRAND_LOGO_DIR="$BRAND_SHARE/logos"
 BRAND_SYMBOLS_DIR="$BRAND_LOGO_DIR/symbols"
 BRAND_PNG_DIR="$BRAND_LOGO_DIR/png"
-BLUEFIN_LOGOS_BASE="https://raw.githubusercontent.com/projectbluefin/common/main/system_files/bluefin/usr/share/ublue-os/bluefin-logos"
+BRAND_PLYMOUTH_DIR="$BRAND_SHARE/plymouth"
+BLUEFIN_COMMON_BASE="https://raw.githubusercontent.com/projectbluefin/common/main/system_files/bluefin"
+BLUEFIN_LOGOS_BASE="$BLUEFIN_COMMON_BASE/usr/share/ublue-os/bluefin-logos"
+BLUEFIN_PLYMOUTH_BASE="$BLUEFIN_COMMON_BASE/usr/share/plymouth/themes/spinner"
 BLUEFIN_MASCOTS=(bluefin chicken dolly karl)
+
+# Onde as artes do sistema entram. Deixei configurável para os testes rodarem
+# sem root; no dia a dia valem os caminhos do Ubuntu.
+PIXMAPS_DIR="${PIXMAPS_DIR:-/usr/share/pixmaps}"
+PLYMOUTH_THEME_DIR="${PLYMOUTH_THEME_DIR:-/usr/share/plymouth/themes/spinner}"
 
 # read_os_field <arquivo> <chave>
 # Lê uma chave do os-release sem sujar as variáveis do instalador.
@@ -67,6 +77,39 @@ download_brand() {
     rm -f "$part"
     return 1
   fi
+}
+
+# install_system_branding <origem> <destino> <rótulo>
+# Instala um arquivo de branding do sistema com backup do original do Ubuntu na
+# mesma pasta (.omakuba-backup). O backup é feito uma vez só, e um arquivo que
+# já está igual não é tocado.
+install_system_branding() {
+  local src="$1" dest="$2" label="$3"
+  local backup="$dest.omakuba-backup"
+
+  if [[ -f "$dest" ]] && cmp -s "$src" "$dest"; then
+    skip "$label já está no lugar: $dest"
+    return 0
+  fi
+
+  if { [[ -e "$dest" ]] || [[ -L "$dest" ]]; } && [[ ! -e "$backup" ]] && [[ ! -L "$backup" ]]; then
+    if run_quiet "guardando o original do Ubuntu ($label)" sudo cp -a "$dest" "$backup"; then
+      skip "backup: $dest -> $backup"
+    else
+      warn "não guardei o backup de $dest"
+    fi
+  fi
+
+  if run_quiet "instalando $label" \
+       sudo install -Dm644 "$src" "$dest.omakuba-new" \
+     && sudo mv -f "$dest.omakuba-new" "$dest"; then
+    ok "$label: $dest"
+    return 0
+  fi
+
+  warn "não instalei $label em $dest"
+  sudo rm -f "$dest.omakuba-new" 2>/dev/null || true
+  return 1
 }
 
 # ---------------------------------------------------------------------------
@@ -148,7 +191,7 @@ for mascot in "${BLUEFIN_MASCOTS[@]}"; do
   download_brand "$BLUEFIN_LOGOS_BASE/$mascot.png" "$BRAND_PNG_DIR/$mascot.png"
 done
 
-SYS_LOGO="/usr/share/pixmaps/$BRAND_VARIANT.png"
+SYS_LOGO="$PIXMAPS_DIR/$BRAND_VARIANT.png"
 if [[ -f "$BRAND_PNG_DIR/bluefin.png" ]]; then
   if [[ -f "$SYS_LOGO" ]] && cmp -s "$BRAND_PNG_DIR/bluefin.png" "$SYS_LOGO"; then
     skip "logo do sistema já está no lugar"
@@ -163,7 +206,69 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# 3. fastfetch
+# 3. o logo do About do GNOME
+# ---------------------------------------------------------------------------
+# No 24.04 o gnome-control-center carrega o logo do About destes dois PNGs:
+# ubuntu-logo-text.png (tema claro) e ubuntu-logo-text-dark.png (tema escuro).
+# Eu troco os dois pelo dodô do Bluefin, sem texto, e guardo os originais do
+# Ubuntu na mesma pasta, com o sufixo .omakuba-backup. O PNG de 192x192 é o
+# mesmo desenho do SVG do 26.04 e já vem no repositório.
+
+ABOUT_LOGO="$DOTFILES_DIR/branding/bluefin-about.png"
+if [[ -f "$ABOUT_LOGO" ]]; then
+  install_system_branding "$ABOUT_LOGO" \
+    "$PIXMAPS_DIR/ubuntu-logo-text.png" "logo do About (tema claro)"
+  install_system_branding "$ABOUT_LOGO" \
+    "$PIXMAPS_DIR/ubuntu-logo-text-dark.png" "logo do About (tema escuro)"
+else
+  skip "sem o logo do About do Bluefin em $ABOUT_LOGO"
+fi
+
+# ---------------------------------------------------------------------------
+# 4. o watermark do Plymouth, como no Bluefin
+# ---------------------------------------------------------------------------
+# O Bluefin troca o watermark do tema spinner pelo dodô. No Ubuntu o tema
+# padrão é o bgrt, que usa o ImageDir do spinner, então trocar o watermark do
+# spinner muda o boot sem mexer no tema padrão. O original do Ubuntu fica
+# guardado no mesmo lugar, com o sufixo .omakuba-backup.
+#
+# O update-initramfs é necessário para a imagem nova entrar no initramfs.
+
+download_brand "$BLUEFIN_PLYMOUTH_BASE/watermark.png" "$BRAND_PLYMOUTH_DIR/watermark.png"
+
+if [[ -f "$BRAND_PLYMOUTH_DIR/watermark.png" ]]; then
+  if [[ -d "$PLYMOUTH_THEME_DIR" ]]; then
+    if [[ -f "$PLYMOUTH_THEME_DIR/watermark.png" ]] \
+       && cmp -s "$BRAND_PLYMOUTH_DIR/watermark.png" "$PLYMOUTH_THEME_DIR/watermark.png"; then
+      skip "watermark do Plymouth já está no lugar"
+    elif install_system_branding "$BRAND_PLYMOUTH_DIR/watermark.png" \
+           "$PLYMOUTH_THEME_DIR/watermark.png" "watermark do Plymouth"; then
+      initramfs_bin=""
+      if command -v update-initramfs >/dev/null 2>&1; then
+        initramfs_bin="update-initramfs"
+      elif [[ -x /usr/sbin/update-initramfs ]]; then
+        initramfs_bin="/usr/sbin/update-initramfs"
+      fi
+
+      if [[ -n "$initramfs_bin" ]]; then
+        if run_quiet "atualizando o initramfs" sudo "$initramfs_bin" -u; then
+          ok "initramfs atualizado"
+        else
+          warn "não atualizei o initramfs (o watermark entra na próxima atualização)"
+        fi
+      else
+        skip "sem update-initramfs (pulei a atualização do initramfs)"
+      fi
+    fi
+  else
+    skip "tema do Plymouth não encontrado em $PLYMOUTH_THEME_DIR (pulei)"
+  fi
+else
+  skip "sem o watermark do Bluefin eu não mexi no Plymouth"
+fi
+
+# ---------------------------------------------------------------------------
+# 5. fastfetch
 # ---------------------------------------------------------------------------
 # No 26.04 o fastfetch está no APT. No 24.04 não está, então baixo o binário do
 # GitHub direto para o ~/.local/bin, sem sudo.
@@ -203,7 +308,7 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# 4. a config do fastfetch e o comando do dia a dia
+# 6. a config do fastfetch e o comando do dia a dia
 # ---------------------------------------------------------------------------
 # O mesmo layout do Bluefin, com os logos dele, tudo no home do usuário.
 
@@ -213,6 +318,9 @@ install_user_file "$DOTFILES_DIR/bin/omakuba-fastfetch" "$HOME/.local/bin/omakub
 install_user_file "$DOTFILES_DIR/bin/omakuba-image-info" "$HOME/.local/bin/omakuba-image-info" 755
 
 info "o os-release, o fastfetch e os logos ficam prontos depois de sair e entrar de novo."
+info "o About do GNOME e o Plymouth também mudam; feche e abra o Settings para ver o logo."
+info "os originais do Ubuntu ficam em *.omakuba-backup (em /usr/share/pixmaps e no tema do Plymouth)."
+info "se um upgrade do base-files ou do Plymouth devolver os originais, rode este passo de novo."
 info "para ver: omakuba-fastfetch (ou fastfetch, no shell novo)."
 info "forçar outra cor: FASTFETCH_THEME=blue omakuba-fastfetch"
-info "marca: OMAKUBA_BRAND_NAME=\"Minha Distro\" ./install.sh 15-branding"
+info "o nome da marca continua configurável por OMAKUBA_BRAND_NAME (veja o README)."
