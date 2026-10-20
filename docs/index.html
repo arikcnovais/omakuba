@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Omakuba — Ubuntu 24.04 e 26.04 LTS pronto para trabalhar</title>
-<meta name="description" content="Omakuba é um script de setup para Ubuntu 24.04 e 26.04 LTS: terminal, desktop, Node, .NET, containers e atualizações em um comando, sem trocar o sistema por uma imagem imutável.">
+<title>Omakuba: setup para Ubuntu 24.04 e 26.04 LTS</title>
+<meta name="description" content="Um script que instala e configura o ambiente que eu uso no Ubuntu 24.04 e 26.04 LTS: terminal, desktop, Node, .NET e alguns apps.">
 <meta name="author" content="arikcnovais">
 <meta name="theme-color" content="#7FD066">
 <meta name="color-scheme" content="light dark">
@@ -12,17 +12,18 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'; upgrade-insecure-requests; require-trusted-types-for 'script'; trusted-types 'none'">
 
 <meta property="og:type" content="website">
-<meta property="og:title" content="Omakuba — Ubuntu 24.04 e 26.04 LTS pronto para trabalhar">
-<meta property="og:description" content="Um comando e o ambiente está pronto: terminal, desktop, Node, .NET, containers e atualizações. APT, .deb e Flatpak continuam.">
+<meta property="og:title" content="Omakuba: setup para Ubuntu 24.04 e 26.04 LTS">
+<meta property="og:description" content="O ambiente que eu uso no Ubuntu, em um script. Terminal, desktop, Node, .NET e alguns apps.">
 <meta property="og:locale" content="pt_BR">
 
 <link rel="icon" type="image/svg+xml" href="assets/omakuba.svg">
+<script src="assets/theme.js"></script>
 <link rel="stylesheet" href="assets/fonts.css">
 <link rel="stylesheet" href="assets/float.css">
 <link rel="stylesheet" href="assets/styles.css">
 <script defer src="assets/app.js"></script>
 </head>
-<body>
+<body class="wallpaper-fire-forest">
 
 <a class="skip-link" href="#instalar">Pular para a instalação</a>
 
@@ -36,47 +37,45 @@
   </div>
 
   <div class="header-right">
-    <nav aria-label="Seções">
+    <nav id="site-nav" class="site-nav" aria-label="Seções">
       <ul class="nav-links" id="nav-links">
         <li><a href="#instalar">Instalar</a></li>
         <li><a href="#recursos">Recursos</a></li>
-        <li><a href="#versoes">24.04 ou 26.04</a></li>
+        <li><a href="#versoes">Versões</a></li>
         <li><a href="#passos">Passos</a></li>
         <li><a href="#comandos">Comandos</a></li>
         <li><a href="#atalhos">Atalhos</a></li>
         <li><a href="#limites">Limites</a></li>
+        <li><a href="#depois">Depois</a></li>
         <li><a href="https://github.com/arikcnovais/omakuba" target="_blank" rel="noopener noreferrer">GitHub</a></li>
       </ul>
     </nav>
-    <button class="btn btn-sm nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links">Menu</button>
-    <button class="btn btn-sm" id="theme-toggle" type="button">Tema: auto</button>
+    <button class="btn btn-sm nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    <button class="btn btn-sm" id="theme-toggle" type="button" title="Tema automático; clique para alternar">Tema: auto</button>
   </div>
 </header>
 
 <main id="top">
 
-  <!-- ===== Hero ====================================================== -->
   <section class="hero" aria-labelledby="hero-title">
     <div>
-      <p class="eyebrow">um script, não uma distro</p>
+      <p class="eyebrow">Ubuntu 24.04 e 26.04 LTS</p>
       <h1 id="hero-title">omakuba</h1>
       <p class="hero-sub">
-        Deixa um <strong>Ubuntu LTS</strong> pronto para trabalhar com web
-        (Node e TypeScript) e C# (.NET): terminal, editor, containers, desktop
-        e atualizações em um comando. O APT, os <code>.deb</code> e o Flatpak
-        continuam normais — nada de virar imagem imutável.
+        Instala e configura o ambiente que eu uso no Ubuntu: Kitty, Zsh,
+        Neovim, Node, .NET, Docker e alguns apps. O APT, os <code>.deb</code> e
+        o Flatpak continuam funcionando.
       </p>
       <div class="hero-actions">
         <a class="btn btn-primary" href="#instalar">Como instalar</a>
-        <a class="btn" href="#recursos">Ver as features</a>
-        <a class="btn" href="https://github.com/arikcnovais/omakuba" target="_blank" rel="noopener noreferrer">Código no GitHub</a>
+        <a class="btn" href="#recursos">O que entra</a>
+        <a class="btn" href="https://github.com/arikcnovais/omakuba" target="_blank" rel="noopener noreferrer">GitHub</a>
       </div>
       <ul class="checks">
         <li>24.04 e 26.04 LTS</li>
-        <li>pode rodar mais de uma vez</li>
+        <li>pode rodar de novo</li>
         <li>dotfiles com backup</li>
         <li>sem telemetria</li>
-        <li>MIT</li>
       </ul>
     </div>
 
@@ -86,265 +85,100 @@
         <pre class="terminal" id="cmd-install"><code><span class="line">git clone https://github.com/arikcnovais/omakuba.git</span>
 <span class="line">cd omakuba</span>
 <span class="line">./install.sh</span>
-<span class="out">o script confere a versão e pede a senha do sudo</span>
-</code></pre>
+<span class="out">o script confere a versão e pede a senha do sudo</span></code></pre>
       </div>
-      <p class="hint">Rode como o seu usuário, não com <code>sudo</code> na frente do comando. O script pede a senha quando precisa.</p>
+      <p class="hint">Rode como o seu usuário; o script pede sudo quando precisa.</p>
     </div>
   </section>
 
-  <!-- ===== 01 Instalar ============================================== -->
   <section id="instalar" aria-labelledby="instalar-title">
     <div class="section-heading">
       <div>
         <span class="num">01</span>
         <h2 id="instalar-title">Instalar</h2>
       </div>
-      <p class="sub">Três comandos, quinze passos, um resumo no fim</p>
     </div>
 
     <p class="lead">
-      O instalador é um shell script. Ele confere se você está no Ubuntu
-      <strong>24.04</strong> ou <strong>26.04 LTS</strong> antes de mexer em
-      qualquer coisa; em outra versão, ele avisa e para. Cada passo verifica o
-      que já existe, então rodar de novo não duplica nem quebra o que está
-      feito.
+      Baixe o repositório, entre na pasta e rode <code>./install.sh</code>. Ele
+      confere a versão do Ubuntu antes de mexer em qualquer coisa e pede a senha
+      do sudo no começo.
     </p>
 
     <div class="grid-2">
       <div class="card green">
-        <h3>Requisitos</h3>
+        <h3>O que precisa</h3>
         <ul>
           <li>Ubuntu 24.04 LTS (GNOME 46) ou 26.04 LTS (GNOME 50)</li>
-          <li>sua conta com <code>sudo</code> — a senha é pedida uma vez</li>
-          <li>internet: APT, Flatpak, Homebrew, npm e downloads do GitHub</li>
-          <li>x86_64 ou arm64 (um download de terceiro avisa se não houver build para a sua arquitetura)</li>
+          <li>uma conta com <code>sudo</code></li>
+          <li>internet para APT, Flatpak, Homebrew, npm e downloads</li>
+          <li>x86_64 ou arm64; se faltar build para a sua arquitetura, o passo avisa</li>
         </ul>
-        <p class="why">Espaço em disco não é fixo: depende dos Flatpaks, do SDK do .NET e do Homebrew que você instalar. Reserve alguns GB.</p>
       </div>
 
       <div class="card green">
         <h3>Antes de rodar</h3>
         <ul>
-          <li>leia a lista de passos com <code>./install.sh --list</code></li>
-          <li>se já tem dotfiles, eles vão para <code>~/.omakuba-backup-&lt;data&gt;/</code></li>
-          <li>um passo que falha não derruba os outros: o resumo sai no final</li>
-          <li><code>./install.sh 90-dotfiles</code> é o único que roda sem sudo</li>
+          <li>os dotfiles que já existem vão para <code>~/.omakuba-backup-&lt;data&gt;/</code></li>
+          <li>o <code>/usr/lib/os-release</code> original não é sobrescrito</li>
+          <li>não há desinstalador; os backups e o APT, Flatpak ou Homebrew são o caminho de volta</li>
         </ul>
-        <p class="why">É um script que mexe no sistema. Rodar em uma máquina que você não pode reinstalar é decisão sua, não do script.</p>
       </div>
-    </div>
-
-    <div class="table-scroll mt-3">
-      <table>
-        <caption>Flags e variáveis de ambiente</caption>
-        <thead>
-          <tr>
-            <th scope="col">Comando</th>
-            <th scope="col">O que faz</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td><code>./install.sh</code></td><td>roda todos os passos, na ordem</td></tr>
-          <tr><td><code>./install.sh --list</code></td><td>só lista os passos da versão do seu Ubuntu</td></tr>
-          <tr><td><code>./install.sh 50-gnome</code></td><td>roda um passo específico (serve para refazer só ele)</td></tr>
-          <tr><td><code>OMAKUBA_FORCE=1 ./install.sh</code></td><td>insiste em outra versão do Ubuntu, por sua conta e risco</td></tr>
-          <tr><td><code>OMAKUBA_DX=1 ./install.sh 80-dx</code></td><td>camada DX: Podman, Distrobox, virt-manager, Incus, Cockpit e Kubernetes</td></tr>
-          <tr><td><code>OMAKUBA_FULL_FLATPAKS=1 ./install.sh 70-flatpaks</code></td><td>instala também o conjunto completo do GNOME em Flatpak (Firefox, Thunderbird…)</td></tr>
-          <tr><td><code>OMAKUBA_TAILSCALE=1 ./install.sh 75-cli</code></td><td>inclui o Tailscale no pacote de linha de comando</td></tr>
-          <tr><td><code>OMAKUBA_WALLPAPER=/caminho/img ./install.sh 60-wallpapers</code></td><td>aplica um wallpaper na hora, em vez de deixar o seu</td></tr>
-          <tr><td><code>OMAKUBA_BRAND_NAME="Meu Sistema" ./install.sh 15-branding</code></td><td>troca o nome que aparece no <code>os-release</code> e no fastfetch</td></tr>
-          <tr><td><code>OMAKUBA_VERBOSE=1 ./install.sh</code></td><td>mostra avisos detalhados, inclusive chaves de gsettings que não existem na sua versão</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="notice">
-      <strong>O script não é root e não deve ser chamado com sudo.</strong>
-      Ele usa <code>sudo</code> nos passos que precisam. O <code>90-dotfiles</code>
-      roda como você e só toca no seu home. Se algo der errado, o backup do que
-      existia está em <code>~/.omakuba-backup-&lt;data&gt;/</code>, o
-      <code>/usr/lib/os-release</code> original nunca é sobrescrito e os logos
-      do About e o watermark do Plymouth ficam em <code>*.omakuba-backup</code>
-      ao lado dos originais.
     </div>
   </section>
 
-  <!-- ===== 02 Recursos ============================================== -->
   <section id="recursos" aria-labelledby="recursos-title">
     <div class="section-heading">
       <div>
         <span class="num">02</span>
         <h2 id="recursos-title">O que entra</h2>
       </div>
-      <p class="sub">Por camada, sem item decorativo</p>
     </div>
-
-    <p class="lead">
-      O critério é simples: se você não usa na primeira semana, não entra.
-      Tudo abaixo é configurado pelo script e conferível com
-      <code>omakuba doctor</code>.
-    </p>
 
     <div class="grid-3">
       <div class="card">
         <div class="icon" aria-hidden="true">▦</div>
         <h3>Desktop</h3>
         <ul>
-          <li>Adwaita dark, acento slate</li>
-          <li>dock do Ubuntu na lateral, com Blur my Shell e lixeira</li>
-          <li>5 workspaces fixos e atalhos</li>
-          <li>relógio com dia da semana, desktop sem ícones</li>
+          <li>Adwaita dark e adw-gtk3 nos apps GTK3</li>
+          <li>dock do Ubuntu, Blur my Shell, Vitals e Caffeine</li>
+          <li>Forge no 24.04; tiling do GNOME no 26.04</li>
         </ul>
-        <p class="why">O jeito do Bluefin no GNOME, sem trocar a base do Ubuntu.</p>
       </div>
 
       <div class="card">
         <div class="icon" aria-hidden="true">&gt;_</div>
         <h3>Terminal</h3>
         <ul>
-          <li>Kitty no <code>Super+Return</code>, paleta Breath</li>
-          <li>Zsh, Starship, autosuggestions e highlighting</li>
-          <li>tmux com histórico de 50 mil linhas</li>
-          <li>Ptyxis como terminal padrão no 26.04</li>
+          <li>Kitty, Zsh, Starship e Neovim</li>
+          <li>Ptyxis como padrão no 26.04; GNOME Terminal no 24.04</li>
+          <li>paleta Breath e os atalhos da seção abaixo</li>
         </ul>
-        <p class="why">É onde o trabalho acontece; por isso vem antes do resto.</p>
       </div>
 
       <div class="card">
         <div class="icon" aria-hidden="true">JS</div>
-        <h3>Web</h3>
+        <h3>Web e .NET</h3>
         <ul>
-          <li>nvm com Node LTS</li>
-          <li>pnpm, yarn, TypeScript e Prettier</li>
-          <li>VS Code com ESLint, Prettier e EditorConfig</li>
-          <li>settings com format on save e telemetria off</li>
+          <li>nvm, Node LTS, pnpm, yarn, TypeScript e Prettier</li>
+          <li>.NET SDK 10, e o 8 quando o repositório tem</li>
+          <li>VS Code com as extensões e as settings</li>
         </ul>
-        <p class="why">Ambiente de front e back pronto sem <code>nvm install</code> na mão.</p>
-      </div>
-
-      <div class="card">
-        <div class="icon" aria-hidden="true">C#</div>
-        <h3>C# e .NET</h3>
-        <ul>
-          <li>.NET SDK 10 no 26.04 (repositório oficial)</li>
-          <li>SDK 8 quando o repositório da sua versão oferece</li>
-          <li>dotnet-ef e CSharpier</li>
-          <li>VS Code com C# e C# Dev Kit</li>
-        </ul>
-        <p class="why">Se você precisa do SDK 8 no 26.04, o caminho é o feed da Microsoft.</p>
-      </div>
-
-      <div class="card">
-        <div class="icon" aria-hidden="true">◫</div>
-        <h3>Containers</h3>
-        <ul>
-          <li>Docker com o seu usuário no grupo, sem sudo</li>
-          <li>DX opcional: Podman e Distrobox</li>
-          <li>DX opcional: virt-manager, Incus e Cockpit</li>
-          <li>DX opcional: ferramentas de Kubernetes e CNCF</li>
-        </ul>
-        <p class="why">Digitar sudo quarenta vezes por dia não é fluxo de trabalho.</p>
-      </div>
-
-      <div class="card">
-        <div class="icon" aria-hidden="true">$_</div>
-        <h3>Linha de comando</h3>
-        <ul>
-          <li>Homebrew com mise, chezmoi, topgrade, dysk e podman-tui</li>
-          <li>APT com bat, eza, fd, ripgrep, fzf, gh, zoxide, direnv</li>
-          <li>tealdeer, trash-cli, yq, glow e uv</li>
-          <li>lazygit e tmux; o Git em si fica por sua conta</li>
-        </ul>
-        <p class="why">As ferramentas que substituem as antigas, sem caçar pacote a pacote.</p>
-      </div>
-
-      <div class="card">
-        <div class="icon" aria-hidden="true">◈</div>
-        <h3>Apps</h3>
-        <ul>
-          <li>Bazaar como a única loja gráfica</li>
-          <li>Flatseal, Extension Manager e Mission Center</li>
-          <li>Gradia, Pinta, Refine, DistroShelf, Ignition e Impression</li>
-          <li>Snap Store sai; <code>snapd</code> e o comando <code>snap</code> ficam</li>
-        </ul>
-        <p class="why">Uma loja só evita o menu com o mesmo app três vezes.</p>
-      </div>
-
-      <div class="card">
-        <div class="icon" aria-hidden="true">↻</div>
-        <h3>Atualizações</h3>
-        <ul>
-          <li><code>omakuba update</code> na mão</li>
-          <li>timer semanal para Flatpak e Homebrew, sem sudo</li>
-          <li>extensões do VS Code também entram</li>
-          <li>APT fica com o <code>unattended-upgrades</code> do Ubuntu</li>
-        </ul>
-        <p class="why">Atualizar não deveria ser um projeto recorrente.</p>
-      </div>
-
-      <div class="card">
-        <div class="icon" aria-hidden="true">◆</div>
-        <h3>Identidade</h3>
-        <ul>
-          <li><code>/etc/os-release</code> com o nome Omakuba</li>
-          <li>logo no <code>/usr/share/pixmaps</code></li>
-          <li>o mesmo dodô no About do GNOME, sem texto</li>
-          <li>watermark do Plymouth com o dodô do Bluefin</li>
-          <li>fastfetch com o layout e as cores do Bluefin</li>
-          <li>sorteio de logo e acento seguindo o GNOME</li>
-        </ul>
-        <p class="why">O sistema se apresenta como Omakuba sem deixar de ser Ubuntu por dentro.</p>
       </div>
     </div>
-
-    <h3 class="subhead">Extensões do GNOME</h3>
-    <div class="table-scroll">
-      <table>
-        <caption>O conjunto do Bluefin, mais o que faz sentido em cada versão</caption>
-        <thead>
-          <tr>
-            <th scope="col">Extensão</th>
-            <th scope="col">24.04</th>
-            <th scope="col">26.04</th>
-            <th scope="col">Para quê</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>AppIndicator</td><td>sim</td><td>sim</td><td>ícones de bandeja</td></tr>
-          <tr><td>Dash to Dock</td><td>sim</td><td>sim</td><td>o dock do Ubuntu na lateral</td></tr>
-          <tr><td>Blur my Shell</td><td>sim</td><td>sim</td><td>blur na barra, no dock e na visão geral</td></tr>
-          <tr><td>Vitals</td><td>sim</td><td>sim</td><td>CPU, memória, disco e rede na barra</td></tr>
-          <tr><td>Caffeine</td><td>sim</td><td>sim</td><td>a máquina não dorme em build longo</td></tr>
-          <tr><td>GSConnect</td><td>sim</td><td>sim</td><td>integração com o KDE Connect no celular</td></tr>
-          <tr><td>Search Light</td><td>sim</td><td>sim</td><td>busca no meio da tela com <code>Super+Space</code></td></tr>
-          <tr><td>Logo Menu</td><td>sim</td><td>sim</td><td>menu do logo no canto</td></tr>
-          <tr><td>Custom Command Menu</td><td>sim</td><td>sim</td><td>lista de comandos rápidos na barra</td></tr>
-          <tr><td>Legacy Theme Auto Switcher</td><td>sim</td><td>sim</td><td>GTK3 alterna junto com o claro/escuro</td></tr>
-          <tr><td>Accent Icons</td><td>não</td><td>sim</td><td>pastas seguem a cor do acento (GNOME 47+)</td></tr>
-          <tr><td>Bazaar Companion</td><td>não</td><td>sim</td><td>abrir um Flatpak direto no Bazaar (GNOME 49+)</td></tr>
-          <tr><td>Forge</td><td>sim</td><td>não</td><td>tiling em árvore com gaps no estilo i3</td></tr>
-          <tr><td>Gradia Capture</td><td>não</td><td>não</td><td>sem build para o GNOME 46 nem 50; o app entra por Flatpak</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="hint">Sem reiniciar o shell: no Wayland as extensões só entram no ar depois de sair e entrar de novo.</p>
   </section>
 
-  <!-- ===== 03 Versões ============================================== -->
   <section id="versoes" aria-labelledby="versoes-title">
     <div class="section-heading">
       <div>
         <span class="num">03</span>
         <h2 id="versoes-title">24.04 ou 26.04?</h2>
       </div>
-      <p class="sub">A mesma base, três diferenças que importam</p>
     </div>
 
     <p class="lead">
-      O objetivo é o mesmo nas duas versões. O que muda é o que o GNOME e os
-      repositórios do Ubuntu oferecem em cada uma — e o script se adapta em vez
-      de fingir que dá.
+      A base é a mesma. O que muda é o que o GNOME e os repositórios de cada
+      versão oferecem.
     </p>
 
     <div class="table-scroll">
@@ -358,36 +192,34 @@
         </thead>
         <tbody>
           <tr><td>GNOME</td><td>46</td><td>50</td></tr>
-          <tr><td>Tiling</td><td>Forge com árvore, gaps de 8px e atalhos <code>Super+h/j/k/l</code></td><td>o tiling padrão do GNOME; o tiling-assistant do Ubuntu continua ligado</td></tr>
-          <tr><td>Terminal padrão</td><td>GNOME Terminal (com perfil e paleta Breath)</td><td>Ptyxis, com fonte, cursor e opacidade ajustados</td></tr>
-          <tr><td>.NET</td><td>SDK 10 e o 8 se estiver no repositório</td><td>SDK 10 no repositório oficial; o 8 não está lá</td></tr>
+          <tr><td>Tiling</td><td>Forge, com gaps e atalhos <code>Super+h/j/k/l</code></td><td>o tiling do GNOME; o tiling-assistant do Ubuntu fica ligado</td></tr>
+          <tr><td>Terminal padrão</td><td>GNOME Terminal</td><td>Ptyxis</td></tr>
+          <tr><td>.NET</td><td>SDK 10 e o 8, se o repositório tiver</td><td>SDK 10; o 8 não está no repositório</td></tr>
           <tr><td>Search Light</td><td>extensions.gnome.org</td><td>branch principal do GitHub, por causa do GNOME 50</td></tr>
-          <tr><td>Favoritos do dock</td><td>Kitty</td><td>Ptyxis</td></tr>
+          <tr><td>Favorito do dock</td><td>Kitty</td><td>Ptyxis</td></tr>
         </tbody>
       </table>
     </div>
 
     <div class="notice">
-      <strong>Recomendação sem rodeio:</strong> se está começando agora, use
-      26.04 LTS. Se já está no 24.04 e o Forge é parte do seu fluxo, fique no
-      24.04 — não vale reinstalar só por causa do Omakuba.
+      <strong>Se está começando, use o 26.04.</strong> Se já está no 24.04 e usa
+      o Forge, fique nele. Não vale reinstalar por causa do Omakuba.
     </div>
   </section>
 
-  <!-- ===== 04 Passos =============================================== -->
   <section id="passos" aria-labelledby="passos-title">
     <div class="section-heading">
       <div>
         <span class="num">04</span>
         <h2 id="passos-title">Os 15 passos</h2>
       </div>
-      <p class="sub">Rode todos ou um de cada vez</p>
     </div>
 
     <p class="lead">
-      Cada passo é um arquivo em <code>lib/</code> e pode ser chamado pelo nome.
-      Eles são independentes o bastante para você rodar só o que quer, e o
-      instalador mostra <code>[n/15]</code> para você saber onde está.
+      Cada passo é um arquivo em <code>lib/</code> e pode rodar sozinho:
+      <code>./install.sh 20-terminal</code>. O instalador mostra
+      <code>[n/15]</code> e um resumo no fim. Se um passo falha, ele segue para
+      o próximo.
     </p>
 
     <div class="table-scroll">
@@ -399,86 +231,58 @@
           </tr>
         </thead>
         <tbody>
-          <tr><td class="step-name">00-base</td><td>ferramentas do dia a dia via APT, Docker, lazygit e os extras do Bluefin que existem no Ubuntu</td></tr>
+          <tr><td class="step-name">00-base</td><td>APT do dia a dia, Docker, lazygit e os extras do Bluefin que existem no Ubuntu</td></tr>
           <tr><td class="step-name">05-store</td><td>remove a Snap Store e o <code>ubuntu-software</code>; mantém o <code>snapd</code> e o comando <code>snap</code></td></tr>
           <tr><td class="step-name">10-fonts</td><td>JetBrainsMono Nerd Font em <code>~/.local/share/fonts</code></td></tr>
-          <tr><td class="step-name">15-branding</td><td>o <code>/etc/os-release</code> com o nome configurável, o logo, o About do GNOME, o Plymouth e o fastfetch</td></tr>
-          <tr><td class="step-name">20-terminal</td><td>Kitty, Zsh como shell padrão, Starship, plugins e o terminal do sistema (Ptyxis ou GNOME Terminal)</td></tr>
+          <tr><td class="step-name">15-branding</td><td><code>os-release</code>, logo, About do GNOME, Plymouth e fastfetch com a identidade do Omakuba</td></tr>
+          <tr><td class="step-name">20-terminal</td><td>Kitty, Zsh, Starship, plugins e o terminal padrão do sistema</td></tr>
           <tr><td class="step-name">30-dev</td><td>nvm, Node LTS, pnpm, yarn, .NET e as ferramentas do dotnet</td></tr>
-          <tr><td class="step-name">40-vscode</td><td>VS Code pelo repositório da Microsoft, extensões e merge das settings</td></tr>
-          <tr><td class="step-name">50-gnome</td><td>extensões, dock, Adwaita, adw-gtk3, tema automático e os ajustes de gsettings</td></tr>
-          <tr><td class="step-name">60-wallpapers</td><td>instala e registra os wallpapers de <code>dotfiles/backgrounds/</code></td></tr>
+          <tr><td class="step-name">40-vscode</td><td>VS Code, as extensões e o merge das settings</td></tr>
+          <tr><td class="step-name">50-gnome</td><td>extensões do Bluefin, dock, workspaces, atalhos, adw-gtk3 e claro/escuro automático</td></tr>
+          <tr><td class="step-name">60-wallpapers</td><td>registra os wallpapers de <code>dotfiles/backgrounds</code>; não aplica nenhum</td></tr>
           <tr><td class="step-name">65-bluefin-wallpapers</td><td>baixa e registra os wallpapers do Bluefin e da Universal Blue</td></tr>
-          <tr><td class="step-name">70-flatpaks</td><td>Flathub, Bazaar, Flatseal, Mission Center, Gradia e os outros apps do Bluefin</td></tr>
-          <tr><td class="step-name">75-cli</td><td>Homebrew e o pacote de ferramentas de linha de comando</td></tr>
-          <tr><td class="step-name">80-dx</td><td>camada DX: containers, VMs e Kubernetes. Só roda com <code>OMAKUBA_DX=1</code></td></tr>
-          <tr><td class="step-name">85-updates</td><td>o comando <code>omakuba</code> e o timer semanal de atualizações</td></tr>
-          <tr><td class="step-name">90-dotfiles</td><td>copia os dotfiles, com backup do que já existia. É o único que não usa sudo</td></tr>
+          <tr><td class="step-name">70-flatpaks</td><td>Flathub, Bazaar, Flatseal, Mission Center e os outros apps do Bluefin</td></tr>
+          <tr><td class="step-name">75-cli</td><td>Homebrew e as ferramentas de linha de comando</td></tr>
+          <tr><td class="step-name">80-dx</td><td>containers, VMs e Kubernetes; só roda com <code>OMAKUBA_DX=1</code></td></tr>
+          <tr><td class="step-name">85-updates</td><td>o comando <code>omakuba</code> e o timer semanal de Flatpak e Homebrew</td></tr>
+          <tr><td class="step-name">90-dotfiles</td><td>copia os dotfiles, com backup do que já existe</td></tr>
         </tbody>
       </table>
     </div>
   </section>
 
-  <!-- ===== 05 Comandos ============================================= -->
   <section id="comandos" aria-labelledby="comandos-title">
     <div class="section-heading">
       <div>
         <span class="num">05</span>
         <h2 id="comandos-title">Comandos</h2>
       </div>
-      <p class="sub">Um comando para o dia a dia, não dez aliases</p>
     </div>
 
-    <p class="lead">
-      O passo <code>85-updates</code> instala o <code>omakuba</code> em
-      <code>~/.local/bin</code> e liga o timer semanal. Ele é o mesmo comando
-      que roda no timer e o mesmo que você digita na mão.
-    </p>
-
-    <div class="grid-2">
-      <div class="terminal-wrap">
-        <button class="btn btn-sm copy-btn" type="button" data-copy="#cmd-usage">Copiar</button>
-        <pre class="terminal" id="cmd-usage"><code><span class="line">omakuba update</span>
+    <div class="terminal-wrap">
+      <button class="btn btn-sm copy-btn" type="button" data-copy="#cmd-usage">Copiar</button>
+      <pre class="terminal" id="cmd-usage"><code><span class="line">omakuba update</span>
 <span class="out">Flatpak, Homebrew e extensões do VS Code</span>
 <span class="line">omakuba update --system</span>
 <span class="out">o mesmo, e também o APT, com sudo</span>
 <span class="line">omakuba doctor</span>
 <span class="out">versões e estado do ambiente</span>
 <span class="line">omakuba dock status</span>
-<span class="out">o dock está ligado?</span>
-</code></pre>
-      </div>
-
-      <div class="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Comando</th>
-              <th scope="col">O que faz</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td><code>omakuba update</code></td><td>Flatpak e Homebrew do seu usuário, sem sudo</td></tr>
-            <tr><td><code>omakuba update --system</code></td><td>inclui <code>apt update</code>, <code>upgrade</code> e <code>autoremove</code></td></tr>
-            <tr><td><code>omakuba doctor</code></td><td>mostra versões e o que entrou ou ficou de fora</td></tr>
-            <tr><td><code>omakuba dock on|off|status</code></td><td>liga, desliga ou consulta o dock</td></tr>
-            <tr><td><code>omakuba store</code></td><td>abre o Bazaar</td></tr>
-            <tr><td><code>omakuba fetch</code></td><td>fastfetch com a cara do Omakuba</td></tr>
-          </tbody>
-        </table>
-      </div>
+<span class="out">o dock está ligado?</span></code></pre>
     </div>
-    <p class="hint">O timer não usa sudo. Quem cuida das atualizações de segurança do sistema é o <code>unattended-upgrades</code> do Ubuntu, que já vem ligado.</p>
+
+    <p class="hint">
+      O timer semanal cuida de Flatpak, Homebrew e extensões do VS Code. O APT
+      fica com o <code>unattended-upgrades</code> do Ubuntu.
+    </p>
   </section>
 
-  <!-- ===== 06 Atalhos ============================================== -->
   <section id="atalhos" aria-labelledby="atalhos-title">
     <div class="section-heading">
       <div>
         <span class="num">06</span>
         <h2 id="atalhos-title">Atalhos</h2>
       </div>
-      <p class="sub">Válidos nas duas versões</p>
     </div>
 
     <div class="grid-2">
@@ -492,7 +296,8 @@
           </thead>
           <tbody>
             <tr><td><code>Super+Return</code></td><td>abre o Kitty</td></tr>
-            <tr><td><code>Ctrl+Alt+T</code></td><td>abre o terminal do sistema</td></tr>
+            <tr><td><code>Ctrl+Alt+T</code></td><td>abre o terminal padrão</td></tr>
+            <tr><td><code>Ctrl+Alt+Return</code></td><td>abre o terminal padrão pelo outro atalho</td></tr>
             <tr><td><code>Super+E</code></td><td>abre o Nautilus numa janela nova</td></tr>
             <tr><td><code>Ctrl+Shift+Esc</code></td><td>abre o Mission Center</td></tr>
             <tr><td><code>Super+Space</code></td><td>abre o Search Light</td></tr>
@@ -520,61 +325,40 @@
             <tr><td><code>Super+Alt+h/l</code></td><td>redimensiona</td></tr>
           </tbody>
         </table>
-        <p class="hint">Quer o tiling-assistant do Ubuntu de volta no 24.04? <code>gnome-extensions enable tiling-assistant@ubuntu.com</code></p>
+        <p class="hint">Quer o tiling-assistant de volta? <code>gnome-extensions enable tiling-assistant@ubuntu.com</code></p>
       </div>
     </div>
   </section>
 
-  <!-- ===== 07 Limites ============================================== -->
   <section id="limites" aria-labelledby="limites-title">
     <div class="section-heading">
       <div>
         <span class="num">07</span>
         <h2 id="limites-title">O que ele não faz</h2>
       </div>
-      <p class="sub">A parte que costuma ficar de fora da página inicial</p>
     </div>
 
-    <p class="lead">
-      Ser honesto sobre o limite é mais útil do que prometer o mundo. Se algum
-      destes itens for decisivo para você, o Omakuba não é a ferramenta certa —
-      e tudo bem.
-    </p>
-
     <ul class="limits">
-      <li><strong>Não é uma distro.</strong> É um script que configura um Ubuntu existente. Não há imagem, ISO nem atualização atômica.</li>
-      <li><strong>Não instala tiling no 26.04.</strong> O Forge não acompanhou o GNOME 50; lá vale o tiling do próprio GNOME.</li>
-      <li><strong>Não configura o Git.</strong> Nome, e-mail, branch padrão e aliases são pessoais. O setup entrega lazygit e tmux, só.</li>
-      <li><strong>Não aplica wallpaper.</strong> Instala e registra os seus e os do Bluefin; o que está em uso continua.</li>
-      <li><strong>Não tem build para o Gradia Capture.</strong> A extensão não existe para o GNOME 46 nem 50; o app entra por Flatpak.</li>
-      <li><strong>Não roda em qualquer Ubuntu.</strong> Fora do 24.04 e 26.04 ele para — a não ser que você use <code>OMAKUBA_FORCE=1</code>.</li>
-      <li><strong>Não tem conta, nuvem ou telemetria.</strong> Nada sai da sua máquina, e não há backend para configurar.</li>
-      <li><strong>Não substitui backup.</strong> O script guarda o que sobrescreve, mas decisão e cópia de segurança continuam sendo suas.</li>
+      <li>Não é uma distro nem uma imagem imutável. É um script que roda no Ubuntu que você já tem.</li>
+      <li>Não tem desinstalador. Os dotfiles antigos ficam em <code>~/.omakuba-backup-&lt;data&gt;</code>; pacotes saem com APT, Flatpak ou Homebrew.</li>
+      <li>Só roda no 24.04 e no 26.04 LTS. Em outra versão ele para; <code>OMAKUBA_FORCE=1</code> insiste.</li>
+      <li>Não substitui backup. O que o script sobrescreve é copiado, mas a cópia de segurança é sua.</li>
     </ul>
   </section>
 
-  <!-- ===== 08 Depois ============================================= -->
   <section id="depois" aria-labelledby="depois-title">
     <div class="section-heading">
       <div>
         <span class="num">08</span>
         <h2 id="depois-title">Depois de instalar</h2>
       </div>
-      <p class="sub">Quatro coisas e o ambiente está no ponto</p>
     </div>
 
     <ol class="steps">
-      <li>Saia e entre de novo na sessão, para as extensões do GNOME carregarem.</li>
-      <li>Rode <code>omakuba doctor</code> e veja o que entrou e o que ficou de fora na sua máquina.</li>
-      <li>Configure o Git, que o Omakuba não mexe: <code>git config --global user.name "Seu Nome"</code> e <code>git config --global user.email "voce@exemplo.com"</code>.</li>
-      <li>Coloque suas imagens em <code>dotfiles/backgrounds/</code> e rode <code>./install.sh 60-wallpapers</code>; o padrão é o Sunrise da Universal Blue, vindo do passo <code>65</code>.</li>
+      <li>Saia e entre de novo no GNOME para as extensões e os atalhos entrarem.</li>
+      <li>Rode <code>omakuba doctor</code> para ver o que entrou e o que ficou de fora.</li>
+      <li>Os wallpapers do repositório ficam na galeria; o script não troca o seu. Para aplicar um agora: <code>OMAKUBA_WALLPAPER=/caminho/da/imagem ./install.sh 60-wallpapers</code>.</li>
     </ol>
-
-    <div class="notice">
-      <strong>Na primeira vez</strong>, o Flatpak e o Homebrew podem baixar
-      runtimes e fórmulas. Isso é normal e só acontece uma vez. Se um download
-      falhar, rode o passo de novo — ele confere o que já está feito.
-    </div>
   </section>
 
 </main>
@@ -583,28 +367,29 @@
   <div class="footer-inner">
     <div>
       <h4>Omakuba</h4>
-      <p>Um setup de Ubuntu feito por hobby, para web e C#. Código próprio, MIT, sem empresa e sem telemetria. A ideia de "um comando e o ambiente está pronto" veio do Omakub, mas o código aqui é outro.</p>
+      <p>Um script para Ubuntu 24.04 e 26.04 LTS. Feito por arikcnovais.</p>
     </div>
     <div>
-      <h4>Projeto</h4>
-      <a href="https://github.com/arikcnovais/omakuba" target="_blank" rel="noopener noreferrer">Código e README</a>
-      <a href="https://github.com/arikcnovais/omakuba/blob/main/DOTFILES.md" target="_blank" rel="noopener noreferrer">Dotfiles</a>
-      <a href="https://github.com/arikcnovais/omakuba/issues" target="_blank" rel="noopener noreferrer">Issues</a>
-      <a href="https://github.com/arikcnovais/omakuba/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Licença MIT</a>
+      <h4>Links</h4>
+      <a href="https://github.com/arikcnovais/omakuba" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="https://github.com/arikcnovais/omakuba/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a>
+      <a href="https://github.com/arikcnovais/omakuba/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Licença</a>
     </div>
     <div>
-      <h4>Float Labs</h4>
-      <a href="https://float-labs-devel.github.io/website/" target="_blank" rel="noopener noreferrer">O laboratório</a>
-      <a href="https://github.com/arikcnovais/float-suite" target="_blank" rel="noopener noreferrer">Float Suite</a>
-      <a href="https://projectbluefin.io/" target="_blank" rel="noopener noreferrer">Bluefin</a>
-      <a href="https://universal-blue.org/" target="_blank" rel="noopener noreferrer">Universal Blue</a>
+      <h4>Créditos</h4>
+      <a href="https://projectbluefin.io" target="_blank" rel="noopener noreferrer">Bluefin</a>
+      <a href="https://github.com/basecamp/omakub" target="_blank" rel="noopener noreferrer">Omakub</a>
+      <a href="https://ubuntu.com" target="_blank" rel="noopener noreferrer">Ubuntu</a>
     </div>
   </div>
   <div class="footer-bottom">
-    <p>MIT © 2026 arikcnovais. As extensões, os wallpapers e o tema têm licença própria, de quem os fez.</p>
-    <p>Não afiliado ao Ubuntu, à Canonical, ao Fedora, à Universal Blue, ao Bluefin ou ao Omakub. Créditos: Omakub pela ideia, Bluefin e Universal Blue pelo desktop e artwork, Manjaro pela paleta Breath.</p>
+    <p>MIT © 2026 arikcnovais.</p>
+    <p><a href="#top">Voltar ao topo ↑</a></p>
   </div>
 </footer>
+
+<p class="sr-only" id="copy-status" role="status" aria-live="polite"></p>
+<a class="to-top" href="#top" aria-label="Voltar ao topo">↑</a>
 
 </body>
 </html>
